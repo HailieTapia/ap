@@ -10,7 +10,7 @@ const usuarioSchema=mongoose.Schema(
         preguntaRecuperacion:{type:String,require:true},
         respuestaPregunta:{type:String,require:true},
         codigoRecuperacion:{type:String},
-        dispositivo:{type:String,unique:true,maxlength:10,minlength:10},
+        dispositivo:{type:String,maxlength:10}
     }
 )
 module.exports=mongoose.model('usuario',usuarioSchema)
