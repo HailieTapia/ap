@@ -126,16 +126,16 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         // Generación del token de recuperación
         const tokenRecuperacion = jwt.sign(
             { _id: usuario._id },
-            'contraseñapass1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
+            'Mon', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
             { expiresIn: '1h' }
         );
 
         // URL de recuperación de contraseña con el token como parámetro
-        const enlaceRecuperacion = `http://localhost:3000/recuperar-contrasena/${tokenRecuperacion}`;
+        const enlaceRecuperacion = `http://localhost:3000/nueva-contrasena/${tokenRecuperacion}`;
 
         // Configuración del correo electrónico
         const mailOptions = {
-            from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
+            from: 'p36076220@gmail.com',
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
@@ -155,34 +155,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
-// Endpoint para verificar código de recuperación y cambiar contraseña
-router.post('/verificar-codigo', async (req, res) => {
-    try {
-        const { correo, codigo, nuevaContrasena } = req.body;
-        const usuario = await esquema.findOne({ correo });
 
-        if (!usuario) {
-            return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
-        }
-
-        // Verificar si el código coincide con el almacenado en el token
-        jwt.verify(codigo, process.env.JWT_SECRET_RECUPERACION, async (err, decoded) => {
-            if (err) {
-                return res.status(400).json({ error: 'El código de verificación no es válido.' });
-            }
-
-            // Actualizar la contraseña del usuario
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(nuevaContrasena, salt);
-
-            await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
-
-            res.json({ message: 'Contraseña actualizada exitosamente.' });
-        });
-    } catch (error) {
-        res.status(500).send('Error en el servidor');
-    }
-});
 
 module.exports = router
 
