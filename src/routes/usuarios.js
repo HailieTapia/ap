@@ -113,10 +113,6 @@ const transporter = nodemailer.createTransport({
         pass: "g j q a o h y x e x s z o f j p",
     },
 });
-
-
-
-
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     try {
@@ -127,14 +123,16 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
+        // Generación del token de recuperación
         const tokenRecuperacion = jwt.sign(
             { _id: usuario._id },
-            'contraseñapass1234',
+            'contraseñapass1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
             { expiresIn: '1h' }
         );
 
+        // Configuración del correo electrónico
         const mailOptions = {
-            from: 'p36076220@gmail.com',
+            from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
@@ -142,6 +140,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
                     <p>${tokenRecuperacion}</p>`,
         };
 
+        // Envío del correo electrónico
         transporter.sendMail(mailOptions, function (error, info) {
             if (error) {
                 return res.status(500).json({ error: 'Error al enviar el correo electrónico.' });
@@ -154,43 +153,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     }
 });
 
-// Endpoint para verificar código de recuperación
-router.post('/usuarios/verificar-codigo', async (req, res) => {
-    try {
-        const { correo, codigo } = req.body;
-        const usuario = await esquema.findOne({ correo });
+module.exports = router
 
-        if (!usuario) {
-            return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
-        }
-
-        if (usuario.codigoRecuperacion !== codigo) {
-            return res.status(400).json({ error: 'El código de verificación no es válido.' });
-        }
-
-        res.json({ message: 'Código de verificación válido.' });
-    } catch (error) {
-        res.status(500).send('Error en el servidor');
-    }
-});
-// Configuración del correo electrónico
-const mailOptions = {
-    from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
-    to: correo,
-    subject: 'Recuperación de Contraseña',
-    html: `<p>Hola ${usuario.nombre},</p>
-                <p>Has solicitado restablecer tu contraseña. Aquí está tu token de recuperación:</p>
-                <p>${tokenRecuperacion}</p>`,
-};
-
-// Envío del correo electrónico
-transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-        return res.status(500).json({ error: 'Error al enviar el correo electrónico.' });
-    } else {
-        // Envío del token de recuperación como respuesta después de enviar el correo electrónico
-        res.json({ tokenRecuperacion, message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
-    }
-});
-
-module.exports = router;
+// process.env.JWT_SECRET_RECUPERACION
+// process.env.EMAIL_USERNAME
