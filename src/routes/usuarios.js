@@ -2,6 +2,8 @@ const express = require('express')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
+const nanoid = require('nanoid');
+const { addHours } = require('date-fns'); // Para manejar fechas y horas en JavaScript
 
 const esquema = require('../models/usuarios')
 
@@ -113,8 +115,6 @@ const transporter = nodemailer.createTransport({
     },
 });
 
-
-// Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     const { correo } = req.body;
     const usuario = await esquema.findOne({ correo });
@@ -123,33 +123,35 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
     }
 
-    // Generación del token de recuperación
-    const tokenRecuperacion = jwt.sign(
-        { _id: usuario._id },
-        'contraseñapass1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
-        { expiresIn: '1h' }
-    );
+    // Generación del identificador único corto
+    const tokenRecuperacion = nanoid.nanoid(8); // Genera un identificador único de 8 caracteres alfanuméricos
 
-    // Configuración del correo electrónico
+    // Asignar el token de recuperación a la cuenta de usuario en la base de datos
+    usuario.tokenRecuperacion = tokenRecuperacion;
+    usuario.tokenRecuperacionExpiracion = addHours(new Date(), 1); // Vence en 1 hora
+    await usuario.save();
+
+    // Envío del correo electrónico con el enlace de recuperación
+    const linkRecuperacion = `https://tudominio.com/recuperar-contrasena/${tokenRecuperacion}`;
     const mailOptions = {
-        from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
+        from: 'p36076220@gmail.com',
         to: correo,
         subject: 'Recuperación de Contraseña',
         html: `<p>Hola ${usuario.nombre},</p>
-                <p>Has solicitado restablecer tu contraseña. Aquí está tu token de recuperación:</p>
-                <p>${tokenRecuperacion}</p>`,
+                <p>Has solicitado restablecer tu contraseña. Haz clic en el siguiente enlace para continuar:</p>
+                <p><a href="${linkRecuperacion}">${linkRecuperacion}</a></p>`,
     };
 
-    // Envío del correo electrónico
     transporter.sendMail(mailOptions, function (error, info) {
         if (error) {
             return res.status(500).json({ error: 'Error al enviar el correo electrónico.' });
         } else {
-            // Envío del token de recuperación como respuesta después de enviar el correo electrónico
-            res.json({ tokenRecuperacion, message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
+            res.json({ message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
         }
     });
 });
+
+
 
 module.exports = router
 
