@@ -157,13 +157,12 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     }
 });
 
-// Endpoint para cambiar la contraseña
 router.post('/usuarios/cambiar-contrasena', async (req, res) => {
     try {
         const { token, nuevaContrasena } = req.body;
 
         // Verificar y decodificar el token de recuperación
-        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
+        jwt.verify(token, 'tu', async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ error: 'El token de recuperación no es válido.' });
             }
@@ -175,10 +174,10 @@ router.post('/usuarios/cambiar-contrasena', async (req, res) => {
 
             await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
 
-            res.json({ message: 'Contraseña actualizada exitosamente.' });
+            res.json({ message: 'Contraseña actualizada exitosamente.' }); // Respondemos con un mensaje JSON
         });
     } catch (error) {
-        res.status(500).send('Error en el servidor');
+        res.status(500).json({ error: 'Error en el servidor' }); // Respondemos con un mensaje JSON en caso de error
     }
 });
 
