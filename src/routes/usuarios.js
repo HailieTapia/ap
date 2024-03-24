@@ -7,32 +7,43 @@ const esquema = require('../models/usuarios')
 
 const router = express.Router()
 
+
 // Endpoint de inicio de sesión
-// Endpoint de inicio de sesión
+router.get('/usuarios/perfil', async (req, res) => {
+    try {
+        const token = req.headers.authorization.split(" ")[1]; // Asume que el token viene en el encabezado Authorization como "Bearer <token>"
+        const decoded = jwt.verify(token, 'tuSecretKey'); // Usa la misma clave secreta que usaste para firmar el token
+        const usuario = await esquema.findById(decoded._id); // Busca el usuario por el ID decodificado del token
+
+        if (!usuario) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        res.json(usuario); // Devuelve el usuario encontrado
+    } catch (error) {
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
 router.post('/usuarios/login', async (req, res) => {
     try {
-        const { correo, contraseña } = req.body;
-
-        // Buscar usuario por correo electrónico
-        const usuario = await esquema.findOne({ correo });
+        const usuario = await esquema.findOne({ correo: req.body.correo });
         if (!usuario) {
             return res.status(404).json({ error: "Usuario incorrecto" });
         }
 
-        // Verificar la contraseña
-        const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
+        const contraseñaValida = await esquema.findOne({ contraseña: req.body.contraseña });
+        const pass = contraseñaValida;
         if (!contraseñaValida) {
             return res.status(401).json({ error: "Contraseña incorrecta" });
         }
 
-        // Generar token de autenticación
+
         const token = jwt.sign(
             { _id: usuario._id, tipo: usuario.tipo },
             'tuSecretKey',
             { expiresIn: '24h' }
         );
-
-        // Enviar token y detalles del usuario
         res.json({
             token,
             user: {
@@ -45,10 +56,16 @@ router.post('/usuarios/login', async (req, res) => {
             }
         });
     } catch (error) {
-        console.error(error);
         res.status(500).send('Error en el servidor');
     }
+
+    //     res.json({ token });
+    // } catch (error) {
+    //     res.status(500).send('Error en el servidor');
+    // }
 });
+
+
 
 router.get('/usuarios/x', (req, res) => {
     res.json({ "response": "Prueba Users" })
