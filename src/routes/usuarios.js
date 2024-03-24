@@ -153,6 +153,36 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     }
 });
 
+// Endpoint para verificar código de recuperación y cambiar contraseña
+router.post('/usuarios/verificar-codigo', async (req, res) => {
+    try {
+        const { correo, codigo, nuevaContrasena } = req.body;
+        const usuario = await esquema.findOne({ correo });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
+        }
+
+        // Verificar si el código coincide con el almacenado en el token
+        // (podrías también verificar si el código ha expirado)
+        jwt.verify(codigo, 'contraseñapass1234', async (err, decoded) => {
+            if (err) {
+                return res.status(400).json({ error: 'El código de verificación no es válido.' });
+            }
+
+            // Actualizar la contraseña del usuario
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(nuevaContrasena, salt);
+
+            await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
+
+            res.json({ message: 'Contraseña actualizada exitosamente.' });
+        });
+    } catch (error) {
+        res.status(500).send('Error en el servidor');
+    }
+});
+
 module.exports = router
 
 // process.env.JWT_SECRET_RECUPERACION
