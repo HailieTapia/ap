@@ -8,25 +8,31 @@ const esquema = require('../models/usuarios')
 const router = express.Router()
 
 // Endpoint de inicio de sesión
+// Endpoint de inicio de sesión
 router.post('/usuarios/login', async (req, res) => {
     try {
-        const usuario = await esquema.findOne({ correo: req.body.correo });
+        const { correo, contraseña } = req.body;
+
+        // Buscar usuario por correo electrónico
+        const usuario = await esquema.findOne({ correo });
         if (!usuario) {
             return res.status(404).json({ error: "Usuario incorrecto" });
         }
 
-        const contraseñaValida = await esquema.findOne({ contraseña: req.body.contraseña });
-        const pass = contraseñaValida;
+        // Verificar la contraseña
+        const contraseñaValida = await bcrypt.compare(contraseña, usuario.contraseña);
         if (!contraseñaValida) {
             return res.status(401).json({ error: "Contraseña incorrecta" });
         }
 
-
+        // Generar token de autenticación
         const token = jwt.sign(
             { _id: usuario._id, tipo: usuario.tipo },
             'tuSecretKey',
             { expiresIn: '24h' }
         );
+
+        // Enviar token y detalles del usuario
         res.json({
             token,
             user: {
@@ -39,15 +45,10 @@ router.post('/usuarios/login', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error(error);
         res.status(500).send('Error en el servidor');
     }
-
-    //     res.json({ token });
-    // } catch (error) {
-    //     res.status(500).send('Error en el servidor');
-    // }
 });
-
 
 router.get('/usuarios/x', (req, res) => {
     res.json({ "response": "Prueba Users" })
@@ -111,8 +112,6 @@ const transporter = nodemailer.createTransport({
         pass: "g j q a o h y x e x s z o f j p",
     },
 });
-
-
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     try {
@@ -123,18 +122,31 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
-        // Generación del token de recuperación
-        const tokenRecuperacion = jwt.sign(
-            { _id: usuario._id },
-            'tu_clave_secreta',
-            { expiresIn: '1h' }
-        ).trim(); // Eliminar espacios adicionales
+        // Generación del token de recuperación de 8 caracteres
+        function generarToken() {
+            const caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let token = '';
+            for (let i = 0; i < 8; i++) {
+                token += caracteres.charAt(Math.floor(Math.random() * caracteres.length));
+            }
+            return token;
+        }
+
+        const tokenRecuperacion = generarToken();
 
         // Actualizar el token de recuperación en la base de datos del usuario
         usuario.tokenRecuperacion = tokenRecuperacion;
         await usuario.save();
 
         // Configuración del correo electrónico
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: "p36076220@gmail.com",
+                pass: "g j q a o h y x e x s z o f j p",
+            },
+        });
+
         const mailOptions = {
             from: 'p36076220@gmail.com',
             to: correo,
