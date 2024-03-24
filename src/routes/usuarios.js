@@ -103,7 +103,6 @@ router.delete('/usuarios/:id', (req, res) => {
 })
 
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
-
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -130,16 +129,13 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        const enlaceRecuperacion = `https://ap-pi.vercel.app/api/usuarios/cambiar-contrasena/${tokenRecuperacion}`;
-
         // Configuración del correo electrónico
         const mailOptions = {
             from: 'p36076220@gmail.com',
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
-                    <p>Has solicitado restablecer tu contraseña. Por favor, sigue el siguiente enlace para establecer una nueva:</p>
-                    <a href="${enlaceRecuperacion}">Restablecer contraseña</a>`,
+                    <p>Has solicitado restablecer tu contraseña. Tu código de verificación es: <strong>${tokenRecuperacion}</strong></p>`,
         };
 
         // Envío del correo electrónico
@@ -154,5 +150,6 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
+
 
 module.exports = router;
