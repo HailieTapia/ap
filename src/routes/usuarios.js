@@ -129,8 +129,8 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         { expiresIn: '1h' }
     );
 
-    // URL de recuperación de contraseña
-    const enlaceRecuperacion = `http://localhost:3000/registrarse/recuperar-contrasena/${tokenRecuperacion}`;
+    // Envío del token de recuperación como respuesta
+    res.json({ tokenRecuperacion });
 
     // Configuración del correo electrónico
     const mailOptions = {
@@ -138,8 +138,8 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         to: correo,
         subject: 'Recuperación de Contraseña',
         html: `<p>Hola ${usuario.nombre},</p>
-                <p>Has solicitado restablecer tu contraseña. Por favor, sigue el siguiente enlace para establecer una nueva:</p>
-                <a href="${enlaceRecuperacion}">Restablecer contraseña</a>`,
+                <p>Has solicitado restablecer tu contraseña. Aquí está tu token de recuperación:</p>
+                <p>${tokenRecuperacion}</p>`,
     };
 
     // Envío del correo electrónico
