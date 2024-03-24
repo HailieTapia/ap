@@ -168,7 +168,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
-// Endpoint para verificar el código de recuperación
+// Endoint para verificar el código de recuperación
 router.post('/usuarios/verificar-codigo', async (req, res) => {
     try {
         const { correo, codigo } = req.body;
