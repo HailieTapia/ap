@@ -3,20 +3,16 @@ const nodemailer = require('nodemailer');
 const esquema = require('../models/usuarios');
 const router = express.Router();
 
-
+// Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
-    host: 'smtp.office365.com',
-    port: 587,
-    secure: false, // true para el puerto 465, false para otros puertos
+    service: 'gmail',
     auth: {
-        user: "proyeqtocuatri@gmail.com", // Aquí ingresa tu dirección de correo electrónico de Outlook
-        pass: "proyequi1254", // Aquí ingresa tu contraseña de correo electrónico de Outlook
+        user: "proyeqtocuatri@gmail.com", // Aquí ingresa tu dirección de correo electrónico
+        pass: "proyequi1254", // Aquí ingresa tu contraseña de correo electrónico
     },
-    tls: {
-        ciphers: 'SSLv3',
-        rejectUnauthorized: false
-    }
 });
+
+
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     const { correo } = req.body;
