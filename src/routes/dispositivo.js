@@ -1,7 +1,8 @@
 const express=require('express')
 const esquema=require('../models/dispositivo')
 const mqtt = require('mqtt');
-const client = mqtt.connect('mqtt://broker.emqx.io:1883');
+const client = mqtt.connect('mqtt://broker.emqx.io:1883');  
+
 
 
 const routerd=express.Router()
