@@ -207,34 +207,63 @@ router.post('/usuarios/verificar-codigo', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
+
+
+router.get('/usuarios/obtener-pregunta-seguridad/:email', async (req, res) => {
+    try {
+        const usuario = await esquema.findOne({ correo: req.params.email });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        res.json({ pregunta: usuario.preguntaRecuperacion });
+    } catch (error) {
+        console.error('Error al obtener la pregunta de seguridad:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+// Endpoint to verify security answer
+router.post('/usuarios/verificar-respuesta-seguridad', async (req, res) => {
+    try {
+        const { correo, respuesta } = req.body;
+        const usuario = await esquema.findOne({ correo });
+
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        if (usuario.respuestaPregunta === respuesta) {
+            res.json({ esCorrecta: true });
+        } else {
+            res.json({ esCorrecta: false });
+        }
+    } catch (error) {
+        console.error('Error al verificar la respuesta:', error);
+        res.status(500).json({ error: 'Error en el servidor' });
+    }
+});
+
+// Endpoint to reset password
 router.post('/usuarios/restablecer-contrasena', async (req, res) => {
     try {
-      const { correo, nuevaContrasena } = req.body;
-  
-      // Buscar el usuario por su correo electrónico
-      const usuario = await esquema.findOne({ correo });
-      if (!usuario) {
-        return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
-      }
-  
-      // Actualizar la contraseña del usuario
-      usuario.contraseña = nuevaContrasena;
-  
-      // Limpiar el campo de código de recuperación
-      usuario.codigoRecuperacion = undefined;
-  
-      await usuario.save();
-  
-      // Respuesta exitosa
-      res.json({ message: 'Contraseña actualizada con éxito.' });
+        const { correo, nuevaContrasena } = req.body;
+
+        const usuario = await esquema.findOne({ correo });
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        usuario.contraseña = nuevaContrasena;
+        usuario.codigoRecuperacion = undefined;
+        await usuario.save();
+
+        res.json({ message: 'Contraseña actualizada con éxito.' });
     } catch (error) {
-      console.error(error);
-      res.status(500).send('Error en el servidor');
+        console.error(error);
+        res.status(500).send('Error en el servidor');
     }
-  });
-  
-
-
-
+});
 
 module.exports = router;
