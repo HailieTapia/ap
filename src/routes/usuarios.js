@@ -135,7 +135,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         const tokenRecuperacion = generarToken();
 
         // Actualizar el token de recuperación en la base de datos del usuario
-        usuario.tokenRecuperacion = tokenRecuperacion;
+        usuario.codigoRecuperacion = tokenRecuperacion;
         await usuario.save();
 
         // Configuración del correo electrónico
@@ -168,33 +168,30 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
-// Endoint para verificar el código de recuperación
+
+// Endpoint para verificar el código de recuperación
 router.post('/usuarios/verificar-codigo', async (req, res) => {
     try {
-        const { correo, codigo } = req.body;
-        
-        // Buscar el usuario por correo electrónico en la base de datos
+        const { correo, codigoRecuperacion } = req.body;
         const usuario = await esquema.findOne({ correo });
 
         if (!usuario) {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
-        console.log('Token almacenado:', usuario.tokenRecuperacion);
-        console.log('Código ingresado:', codigo.trim());
-
-        // Verificar si el código de verificación coincide con el token de recuperación almacenado en el usuario
-        if (usuario.tokenRecuperacion !== codigo.trim()) {
-            return res.status(400).json({ error: 'El código de verificación es incorrecto.' });
+        // Verificar si el código de recuperación coincide
+        if (usuario.codigoRecuperacion === codigoRecuperacion) {
+            return res.json({ message: 'Código de recuperación válido.' });
+        } else {
+            return res.status(400).json({ error: 'Código de recuperación no válido.' });
         }
-
-        // Si el código es válido, puedes responder con un mensaje de éxito
-        res.json({ message: 'Código verificado correctamente.' });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error en el servidor');
     }
 });
+
+
 
 
 module.exports = router;
