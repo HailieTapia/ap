@@ -162,7 +162,7 @@ router.post('/usuarios/cambiar-contrasena', async (req, res) => {
         const { token, nuevaContrasena } = req.body;
 
         // Verificar y decodificar el token de recuperación
-        jwt.verify(token, 'tu', async (err, decoded) => {
+        jwt.verify(token, 'Mon', async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ error: 'El token de recuperación no es válido.' });
             }
