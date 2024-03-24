@@ -111,6 +111,8 @@ const transporter = nodemailer.createTransport({
         pass: "g j q a o h y x e x s z o f j p",
     },
 });
+
+
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     try {
@@ -121,18 +123,26 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
-        // Generación del token de recuperación
+        // Generación del token de recuperación sin espacios adicionales
         const tokenRecuperacion = jwt.sign(
             { _id: usuario._id },
             'tu_clave_secreta', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
             { expiresIn: '1h' }
-        );
+        ).trim();
 
         // Actualizar el token de recuperación en la base de datos del usuario
         usuario.tokenRecuperacion = tokenRecuperacion;
         await usuario.save();
 
         // Configuración del correo electrónico
+        const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+                user: "p36076220@gmail.com",
+                pass: "g j q a o h y x e x s z o f j p",
+            },
+        });
+
         const mailOptions = {
             from: 'p36076220@gmail.com',
             to: correo,
@@ -154,10 +164,12 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
+
+// Endpoint para verificar el código de recuperación
 router.post('/usuarios/verificar-codigo', async (req, res) => {
     try {
         const { correo, codigo } = req.body;
-        
+
         // Buscar el usuario por correo electrónico en la base de datos
         const usuario = await esquema.findOne({ correo });
 
@@ -165,20 +177,17 @@ router.post('/usuarios/verificar-codigo', async (req, res) => {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
-        // Aquí deberías verificar si el código de verificación coincide con el token de recuperación almacenado en la base de datos
-        // Supongamos que el token de recuperación está almacenado en la propiedad 'tokenRecuperacion' del usuario
-        if (usuario.tokenRecuperacion !== codigo) {
+        // Verificar si el código de verificación coincide con el token de recuperación almacenado
+        if (usuario.tokenRecuperacion.trim() !== codigo.trim()) {
             return res.status(400).json({ error: 'El código de verificación es incorrecto.' });
         }
 
-        // Si el código es válido, puedes responder con un mensaje de éxito
+        // Si el código es válido, responder con un mensaje de éxito
         res.json({ message: 'Código verificado correctamente.' });
     } catch (error) {
         console.error(error);
         res.status(500).send('Error en el servidor');
     }
 });
-
-
 
 module.exports = router;
