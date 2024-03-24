@@ -1,10 +1,13 @@
 const express=require('express')
 const esquema=require('../models/dispositivo')
+const mqtt = require('mqtt');
+const client = mqtt.connect('mqtt://broker.emqx.io:1883');
+
 
 const routerd=express.Router()
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
-    res.json({"response":"Prueba Device"})
+    res.json({"response":"Prueba Disp"})
 })
 
 routerd.post('/dispositivo',(req,res)=>{
@@ -30,14 +33,22 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 }) 
 
 //actualizar dispositivo
-routerd.put('/dispositivo/:id',(req,res)=>{
-    const{id}=req.params;
-    const{modelo,estado}=req.body
-    esquema
-    .updateOne({_id:id},{$set:{modelo,estado}})
-    .then((data)=>res.json(data))
-    .catch((error)=>res.json({message:error}))
-})
+// Actualizar dispositivo
+routerd.put('/dispositivo/:id', (req, res) => {
+    const { id } = req.params;
+    const { nombre, temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
+    esquema.findByIdAndUpdate(id, {
+      nombre,
+      temperatura,
+      humedad,
+      estadoFoco,
+      estadoCerradura,
+      estadoVentilador,
+      estadoVentilador2
+    }, { new: true }) // Devuelve el documento actualizado
+    .then(data => res.json(data))
+    .catch(error => res.json({ message: error }));
+});
 
 //eliminar dispositivo
 routerd.delete('/dispositivo/:id',(req,res)=>{
