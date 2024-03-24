@@ -8,7 +8,7 @@ const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
         user: "proyeqtocuatri@gmail.com", // Aquí ingresa tu dirección de correo electrónico
-        pass: "proyequi1254", // Aquí ingresa tu contraseña de correo electrónico
+        pass: "g j q a o h y x e x s z o f j p", // Aquí ingresa tu contraseña de correo electrónico
     },
 });
 
