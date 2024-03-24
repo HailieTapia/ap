@@ -130,8 +130,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
             { expiresIn: '1h' }
         );
 
-        // URL de recuperación de contraseña con el token como parámetro
-        const enlaceRecuperacion = `https://ap-pi.vercel.app/api/usuarios/cambiar-contrasena${tokenRecuperacion}`;
+        const enlaceRecuperacion = `https://ap-pi.vercel.app/api/usuarios/cambiar-contrasena/${tokenRecuperacion}`;
 
         // Configuración del correo electrónico
         const mailOptions = {
