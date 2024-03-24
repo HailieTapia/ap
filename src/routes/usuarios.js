@@ -115,7 +115,6 @@ const transporter = nodemailer.createTransport({
 });
 
 // Endpoint para solicitar recuperación de contraseña
-// Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     const { correo } = req.body;
     const usuario = await esquema.findOne({ correo });
