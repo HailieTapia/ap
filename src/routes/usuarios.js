@@ -154,6 +154,33 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
+// Endpoint para verificar el código de recuperación y permitir el cambio de contraseña
+router.post('/usuarios/verificar-codigo', async (req, res) => {
+    try {
+        const { token, nuevaContrasena } = req.body;
+
+        // Verificar si el token de recuperación es válido
+        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
+            if (err) {
+                return res.status(401).json({ error: 'Token de recuperación inválido o expirado.' });
+            }
+
+            // Si el token es válido, actualizar la contraseña del usuario
+            const usuario = await esquema.findById(decoded._id);
+            if (!usuario) {
+                return res.status(404).json({ error: 'Usuario no encontrado.' });
+            }
+
+            // Actualizar la contraseña del usuario
+            usuario.contraseña = nuevaContrasena;
+            await usuario.save();
+
+            res.json({ message: 'Contraseña actualizada exitosamente.' });
+        });
+    } catch (error) {
+        res.status(500).send('Error en el servidor');
+    }
+});
 
 
 module.exports = router;
