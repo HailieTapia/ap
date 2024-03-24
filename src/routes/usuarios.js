@@ -168,7 +168,6 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
-
 // Endpoint para verificar el código de recuperación
 router.post('/usuarios/verificar-codigo', async (req, res) => {
     try {
@@ -180,6 +179,9 @@ router.post('/usuarios/verificar-codigo', async (req, res) => {
         if (!usuario) {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
+
+        console.log('Token almacenado:', usuario.tokenRecuperacion);
+        console.log('Código ingresado:', codigo.trim());
 
         // Verificar si el código de verificación coincide con el token de recuperación almacenado en el usuario
         if (usuario.tokenRecuperacion !== codigo.trim()) {
@@ -193,5 +195,6 @@ router.post('/usuarios/verificar-codigo', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
+
 
 module.exports = router;
