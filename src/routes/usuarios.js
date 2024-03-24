@@ -37,7 +37,7 @@ router.post('/usuarios/login', async (req, res) => {
                 apellido: usuario.apellido,
                 correo: usuario.correo,
                 tipo: usuario.tipo,
-                // Puedes agregar más campos según necesites
+                // Puedes agregar más cammpos según necesites
             }
         });
     } catch (error) {
