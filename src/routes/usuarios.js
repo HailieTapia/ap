@@ -113,6 +113,7 @@ const transporter = nodemailer.createTransport({
     },
 });
 
+
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     const { correo } = req.body;
@@ -129,9 +130,6 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         { expiresIn: '1h' }
     );
 
-    // Envío del token de recuperación como respuesta
-    res.json({ tokenRecuperacion });
-
     // Configuración del correo electrónico
     const mailOptions = {
         from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
@@ -147,11 +145,11 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         if (error) {
             return res.status(500).json({ error: 'Error al enviar el correo electrónico.' });
         } else {
-            res.json({ message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
+            // Envío del token de recuperación como respuesta después de enviar el correo electrónico
+            res.json({ tokenRecuperacion, message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
         }
     });
 });
-
 
 module.exports = router
 
