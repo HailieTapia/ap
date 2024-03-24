@@ -112,13 +112,6 @@ const transporter = nodemailer.createTransport({
         user: "p36076220@gmail.com",
         pass: "g j q a o h y x e x s z o f j p",
     },
-});// Configuración del transportador de nodemailer
-const transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-        user: "p36076220@gmail.com",
-        pass: "g j q a o h y x e x s z o f j p",
-    },
 });
 
 // Endpoint para solicitar recuperación de contraseña
