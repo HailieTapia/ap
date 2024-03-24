@@ -104,6 +104,7 @@ router.delete('/usuarios/:id', (req, res) => {
 
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 
+
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -112,7 +113,6 @@ const transporter = nodemailer.createTransport({
         pass: "g j q a o h y x e x s z o f j p",
     },
 });
-
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     const { correo } = req.body;
@@ -125,12 +125,9 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     // Generación del token de recuperación
     const tokenRecuperacion = jwt.sign(
         { _id: usuario._id },
-        'cs1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
+        'contraseñapass1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
         { expiresIn: '1h' }
     );
-
-    // Envío del token de recuperación como respuesta
-    res.json({ tokenRecuperacion });
 
     // Configuración del correo electrónico
     const mailOptions = {
@@ -147,13 +144,11 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         if (error) {
             return res.status(500).json({ error: 'Error al enviar el correo electrónico.' });
         } else {
-            res.json({ message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
+            // Envío del token de recuperación como respuesta después de enviar el correo electrónico
+            res.json({ tokenRecuperacion, message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
         }
     });
 });
 
 
-module.exports = router
-
-// process.env.JWT_SECRET_RECUPERACION
-// process.env.EMAIL_USERNAME
+module.exports = router;
