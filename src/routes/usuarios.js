@@ -157,6 +157,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     }
 });
 
+// Endpoint para cambiar la contraseña
 router.post('/usuarios/cambiar-contrasena', async (req, res) => {
     try {
         const { token, nuevaContrasena } = req.body;
@@ -168,17 +169,15 @@ router.post('/usuarios/cambiar-contrasena', async (req, res) => {
             }
 
             // Actualizar la contraseña del usuario
-            const usuario = await esquema.findById(decoded._id);
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(nuevaContrasena, salt);
 
-            await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
+            await esquema.findByIdAndUpdate(decoded._id, { contraseña: hashedPassword });
 
-            res.json({ message: 'Contraseña actualizada exitosamente.' }); // Respondemos con un mensaje JSON
+            res.json({ message: 'Contraseña actualizada exitosamente.' });
         });
     } catch (error) {
-        res.status(500).json({ error: 'Error en el servidor' }); // Respondemos con un mensaje JSON en caso de error
+        res.status(500).json({ error: 'Error en el servidor' });
     }
 });
-
 module.exports = router;
