@@ -128,7 +128,29 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         'contraseñapass1234', // Aquí deberías usar process.env.JWT_SECRET_RECUPERACION
         { expiresIn: '1h' }
     );
+    // Endpoint para verificar código de recuperación
+    router.post('/usuarios/verificar-codigo', async (req, res) => {
+        try {
+            const { correo, codigo } = req.body;
+            const usuario = await esquema.findOne({ correo });
 
+            if (!usuario) {
+                return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
+            }
+
+            // Verificar si el código coincide con el almacenado en la base de datos
+            if (usuario.codigoRecuperacion !== codigo) {
+                return res.status(400).json({ error: 'El código de verificación no es válido.' });
+            }
+
+            // Verificar si el código ha expirado (puedes agregar esta verificación si es necesario)
+
+            // Si todo está bien, enviar una respuesta exitosa
+            res.json({ message: 'Código de verificación válido.' });
+        } catch (error) {
+            res.status(500).send('Error en el servidor');
+        }
+    });
     // Configuración del correo electrónico
     const mailOptions = {
         from: 'p36076220@gmail.com', // Aquí deberías usar process.env.EMAIL_USERNAME
