@@ -181,7 +181,7 @@ router.post('/usuarios/verificar-codigo', async (req, res) => {
             return res.status(404).json({ error: 'No se encontró un usuario con ese correo electrónico.' });
         }
 
-        // Verificar si el código de verificación coincide con el token de recuperación almacenado en la base de datos
+        // Verificar si el código de verificación coincide con el token de recuperación almacenado en el usuario
         if (usuario.tokenRecuperacion !== codigo.trim()) {
             return res.status(400).json({ error: 'El código de verificación es incorrecto.' });
         }
