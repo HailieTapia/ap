@@ -104,6 +104,7 @@ router.delete('/usuarios/:id', (req, res) => {
 
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 
+
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -126,11 +127,12 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         // Generación del token de recuperación
         const tokenRecuperacion = jwt.sign(
             { _id: usuario._id },
-            'tu_clave_secreta', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
+            'Mon', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
             { expiresIn: '1h' }
         );
 
-        const enlaceRecuperacion = `https://ap-pi.vercel.app/api/usuarios/cambiar-contrasena/${tokenRecuperacion}`;
+        // URL de recuperación de contraseña con el token como parámetro
+        const enlaceRecuperacion = `http://localhost:3000/nueva-contrasena/${tokenRecuperacion}`;
 
         // Configuración del correo electrónico
         const mailOptions = {
@@ -154,61 +156,29 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         res.status(500).send('Error en el servidor');
     }
 });
-// Endpoint para verificar el código de recuperación y permitir el cambio de contraseña
-router.post('/usuarios/verificar-codigo', async (req, res) => {
+
+router.post('/usuarios/cambiar-contrasena', async (req, res) => {
     try {
         const { token, nuevaContrasena } = req.body;
 
-        // Verificar si el token de recuperación es válido
-        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
+        // Verificar y decodificar el token de recuperación
+        jwt.verify(token, 'Mon', async (err, decoded) => {
             if (err) {
-                return res.status(401).json({ error: 'Token de recuperación inválido o expirado.' });
-            }
-
-            // Si el token es válido, actualizar la contraseña del usuario
-            const usuario = await esquema.findById(decoded._id);
-            if (!usuario) {
-                return res.status(404).json({ error: 'Usuario no encontrado.' });
+                return res.status(400).json({ error: 'El token de recuperación no es válido.' });
             }
 
             // Actualizar la contraseña del usuario
-            usuario.contraseña = nuevaContrasena;
-            await usuario.save();
-
-            res.json({ message: 'Contraseña actualizada exitosamente.' });
-        });
-    } catch (error) {
-        res.status(500).send('Error en el servidor');
-    }
-});
-
-router.post('/usuarios/cambiar-contrasena/:token', async (req, res) => {
-    try {
-        const { token } = req.params;
-        const { nuevaContrasena } = req.body;
-
-        // Verificar si el token de recuperación es válido
-        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
-            if (err) {
-                return res.status(401).json({ error: 'Token de recuperación inválido o expirado.' });
-            }
-
-            // Si el token es válido, actualizar la contraseña del usuario
             const usuario = await esquema.findById(decoded._id);
-            if (!usuario) {
-                return res.status(404).json({ error: 'Usuario no encontrado.' });
-            }
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(nuevaContrasena, salt);
 
-            // Actualizar la contraseña del usuario
-            usuario.contraseña = nuevaContrasena;
-            await usuario.save();
+            await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
 
-            res.json({ message: 'Contraseña actualizada exitosamente.' });
+            res.json({ message: 'Contraseña actualizada exitosamente.' }); // Respondemos con un mensaje JSON
         });
     } catch (error) {
-        res.status(500).send('Error en el servidor');
+        res.status(500).json({ error: 'Error en el servidor' }); // Respondemos con un mensaje JSON en caso de error
     }
 });
-
 
 module.exports = router;
