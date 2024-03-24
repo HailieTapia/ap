@@ -104,7 +104,6 @@ router.delete('/usuarios/:id', (req, res) => {
 
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 
-
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -127,12 +126,12 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         // Generación del token de recuperación
         const tokenRecuperacion = jwt.sign(
             { _id: usuario._id },
-            'Mon', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
+            'tu_clave_secreta', // Reemplazar 'tu_clave_secreta' con tu propia clave secreta
             { expiresIn: '1h' }
         );
 
         // URL de recuperación de contraseña con el token como parámetro
-        const enlaceRecuperacion = `http://localhost:3000/nueva-contrasena/${tokenRecuperacion}`;
+        const enlaceRecuperacion = `https://ap-pi.vercel.app/api/usuarios/nueva-contrasena/${tokenRecuperacion}`;
 
         // Configuración del correo electrónico
         const mailOptions = {
@@ -163,7 +162,7 @@ router.post('/usuarios/cambiar-contrasena', async (req, res) => {
         const { token, nuevaContrasena } = req.body;
 
         // Verificar y decodificar el token de recuperación
-        jwt.verify(token, 'Mon', async (err, decoded) => {
+        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
             if (err) {
                 return res.status(400).json({ error: 'El token de recuperación no es válido.' });
             }
@@ -180,4 +179,5 @@ router.post('/usuarios/cambiar-contrasena', async (req, res) => {
         res.status(500).json({ error: 'Error en el servidor' });
     }
 });
+
 module.exports = router;
