@@ -192,7 +192,5 @@ transporter.sendMail(mailOptions, function (error, info) {
         res.json({ tokenRecuperacion, message: 'Se ha enviado un correo electrónico con las instrucciones para restablecer tu contraseña.' });
     }
 });
-});
-
 
 module.exports = router;
