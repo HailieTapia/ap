@@ -112,7 +112,15 @@ const transporter = nodemailer.createTransport({
         user: "p36076220@gmail.com",
         pass: "g j q a o h y x e x s z o f j p",
     },
+});// Configuración del transportador de nodemailer
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: "p36076220@gmail.com",
+        pass: "g j q a o h y x e x s z o f j p",
+    },
 });
+
 // Endpoint para solicitar recuperación de contraseña
 router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     try {
@@ -156,8 +164,29 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     }
 });
 
+// Endpoint para cambiar la contraseña
+router.post('/usuarios/cambiar-contrasena', async (req, res) => {
+    try {
+        const { token, nuevaContrasena } = req.body;
 
-module.exports = router
+        // Verificar y decodificar el token de recuperación
+        jwt.verify(token, 'tu_clave_secreta', async (err, decoded) => {
+            if (err) {
+                return res.status(400).json({ error: 'El token de recuperación no es válido.' });
+            }
 
-// process.env.JWT_SECRET_RECUPERACION
-// process.env.EMAIL_USERNAME
+            // Actualizar la contraseña del usuario
+            const usuario = await esquema.findById(decoded._id);
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(nuevaContrasena, salt);
+
+            await esquema.findByIdAndUpdate(usuario._id, { contraseña: hashedPassword });
+
+            res.json({ message: 'Contraseña actualizada exitosamente.' });
+        });
+    } catch (error) {
+        res.status(500).send('Error en el servidor');
+    }
+});
+
+module.exports = router;
