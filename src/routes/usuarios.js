@@ -105,6 +105,7 @@ router.delete('/usuarios/:id', (req, res) => {
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 
 
+
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -126,7 +127,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
     // Generación del token de recuperación
     const tokenRecuperacion = jwt.sign(
         { _id: usuario._id },
-        process.env.JWT_SECRET_RECUPERACION,
+        'contraseñapass1234', // Aquí deberías usar un secreto más seguro, por ejemplo, una cadena larga y aleatoria
         { expiresIn: '1h' }
     );
 
@@ -136,7 +137,7 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
 
         // Configuración del correo electrónico
         const mailOptions = {
-            from: process.env.EMAIL_USERNAME, // Utiliza el correo configurado en las variables de entorno
+            from: 'p36076220@gmail.com', // Utiliza la dirección de correo configurada en el transportador
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
