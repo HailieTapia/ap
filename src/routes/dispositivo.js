@@ -14,15 +14,12 @@ client.on('connect', () => {
         }
     });
 });
-
 client.on('message', (topic, message) => {
     if (topic === "Entrada/01") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "65ff5db2656ceb696b6022da"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
-        Dispositivo.updateOne({_id: dispositivoId}, {$set: { 
-            nombre: estado.nombre,
+        esquema.findOneAndUpdate({ nombre: estado.nombre }, { 
             estadoFoco: estado.estadoFoco,
             estadoCerradura: estado.estadoCerradura,
             estadoVentilador: estado.estadoVentilador,
@@ -30,12 +27,11 @@ client.on('message', (topic, message) => {
             temperatura: estado.temperatura,
             humedad: estado.humedad,
             fechaHora: new Date(estado.fechaHora)
-        }})
+        }, { new: true, upsert: true })
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
-
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
