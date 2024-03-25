@@ -40,6 +40,7 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
     res.status(200).send('Temperatura recibida con éxito');
 });
 
+
 // Nuevo endpoint para enviar comandos a dispositivos específicos
 routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo (si necesario para lógica específica)
@@ -59,7 +60,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     });
 });
 
-//hola
+
 
 //eliminar dispositivo
 routerd.delete('/dispositivo/:id',(req,res)=>{
