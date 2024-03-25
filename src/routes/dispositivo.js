@@ -21,7 +21,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "66014fded1838eb3f70e0217"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
@@ -82,7 +82,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "66014fded1838eb3f70e0217";
+    const dispositivoIdValido = "66019909c4c14782c2a61628";
 
     // Verificar que el ID del dispositivo es el esperado
     if (id !== dispositivoIdValido) {
