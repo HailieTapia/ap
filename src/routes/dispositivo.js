@@ -98,7 +98,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     }
 
     // Si el ID es válido, proceder a publicar el comando al topic MQTT
-    client.publish('dispensador/01', comando, (error) => {
+    client.publish('Entrada/01', comando, (error) => {
         if (error) {
             console.error("Error al publicar mensaje MQTT", error);
             return res.status(500).json({ message: "Error al enviar comando MQTT." });
