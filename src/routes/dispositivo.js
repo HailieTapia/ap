@@ -24,18 +24,19 @@ client.on('message', (topic, message) => {
         const dispositivoId = "65ff5db2656ceb696b6022da";
 
         esquema.updateOne({_id: dispositivoId}, {$set: { 
-            temperatura: estado.temp, // Corrige el acceso al campo temperatura
-            humedad: estado.hum, // Corrige el acceso al campo humedad
-            estadoFoco: estado.foco ? "encendido" : "apagado", // Corrige el acceso al campo foco
-            estadoVentilador: estado.ventilador ? "encendido" : "apagado", // Corrige el acceso al campo ventilador
-            estadoVentilador2: estado.ventilador2 ? "encendido" : "apagado", // Corrige el acceso al campo ventilador2
-            estadoCerradura: estado.cerradura ? "abierta" : "cerrada" // Corrige el acceso al campo cerradura
+            nombre: "Dispositivo de Prueba",
+            temperatura: estado.temperatura,
+            humedad: estado.humedad,
+            estadoFoco: estado.estadoFoco,
+            estadoVentilador: estado.estadoVentilador,
+            estadoVentilador2: estado.estadoVentilador2,
+            estadoCerradura: estado.estadoCerradura,
+            fechaHora: new Date() // Establece la fecha y hora actual
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
-
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
