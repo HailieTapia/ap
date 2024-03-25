@@ -22,12 +22,14 @@ client.on('message', (topic, message) => {
 
         // Actualizar la base de datos con los nuevos estados
         Dispositivo.updateOne({_id: dispositivoId}, {$set: { 
-            estadoFoco: estado.focoOn,
-            estadoCerradura: estado.cerraduraOpen,
-            estadoVentilador: estado.ventiladorOn,
-            estadoVentilador2: estado.ventilador2On,
-            temperatura: estado.temp,
-            humedad: estado.hum
+            nombre: estado.nombre,
+            estadoFoco: estado.estadoFoco,
+            estadoCerradura: estado.estadoCerradura,
+            estadoVentilador: estado.estadoVentilador,
+            estadoVentilador2: estado.estadoVentilador2,
+            temperatura: estado.temperatura,
+            humedad: estado.humedad,
+            fechaHora: new Date(estado.fechaHora)
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
