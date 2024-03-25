@@ -1,12 +1,13 @@
 const mongoose = require('mongoose');
 
 const dispositivoSchema = mongoose.Schema({
-    temperatura: { type: Number, required: false }, // Agregamos el campo temperatura
-    humedad: { type: Number, required: false }, // Agregamos el campo temperatura
-    estadoFoco: { type: String, required: false }, // Agregamos el campo estadoFoco
-    estadoCerradura: { type: String, required: false }, // Agregamos el campo estadoCerradura
-    estadoVentilador: { type: String, required: false },// Agregamos el campo estadoVentilador
-    estadoVentilador2: { type: String, required: false } // Agregamos el campo estadoVentilador
+    temperatura: { type: Number, required: false }, // Campo temperatura
+    humedad: { type: Number, required: false }, // Campo humedad
+    estadoFoco: { type: String, required: false }, // Campo estadoFoco
+    estadoCerradura: { type: String, required: false }, // Campo estadoCerradura
+    estadoVentilador: { type: String, required: false }, // Campo estadoVentilador
+    estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
+    motor: { type: String, required: false } // Campo motor
 });
 
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);

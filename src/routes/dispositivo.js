@@ -18,25 +18,34 @@ client.on('connect', () => {
 });
 
 client.on('message', (topic, message) => {
-    // Suponiendo que el topic es "dispensador/estado"
+    // Suponiendo que el topic es "Entrada/01/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
-        esquema.updateOne({_id: dispositivoId}, {$set: { 
-            temperatura: estado.temperatura ,// Agregamos la temperatura
-            humedad: estado.humedad, // Agregamos la temperatura
-            estadoFoco: estado.estadoFoco,
-            estadoCerradura: estado.estadoCerradura,
-            estadoVentilador: estado.estadoVentilador,
-            estadoVentilador2: estado.estadoVentilador2
-        }})
-        .then(result => console.log("Actualización exitosa", result))
-        .catch(error => console.error("Error al actualizar el dispositivo", error));
+        Dispositivo.findOneAndUpdate(
+            { /* Filtros de búsqueda */ },
+            { 
+                temperatura: estado.temperatura,
+                humedad: estado.humedad,
+                estadoFoco: estado.estadoFoco,
+                estadoCerradura: estado.estadoCerradura,
+                estadoVentilador: estado.estadoVentilador,
+                estadoVentilador2: estado.estadoVentilador2,
+                motor: estado.motor // Agregar el estado del motor
+            },
+            { new: true } // Devolver el nuevo documento actualizado
+        )
+        .then(dispositivoActualizado => {
+            if (dispositivoActualizado) {
+                console.log("Dispositivo actualizado:", dispositivoActualizado);
+            } else {
+                console.log("Dispositivo no encontrado");
+            }
+        })
+        .catch(error => console.error("Error al actualizar el dispositivo:", error));
     }
 });
-
 
 
 
@@ -71,9 +80,21 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
-    // Guarda la temperatura en la base de datos o haz lo que necesites con ella
-    console.log('Temperatura recibida:', temperatura);
-    res.status(200).send('Temperatura recibida con éxito');
+    const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+
+    try {
+        // Guarda la temperatura en la base de datos
+        await esquema.updateOne({ _id: dispositivoId }, { $set: { temperatura } });
+        
+        // Envia la temperatura al cliente a través de WebSockets o SSE
+        // Ejemplo usando WebSocket: ws.send(JSON.stringify({ temperatura }));
+        // Ejemplo usando SSE: sseMiddleware.send({ temperatura });
+
+        res.status(200).send('Temperatura recibida con éxito');
+    } catch (error) {
+        console.error("Error al guardar la temperatura:", error);
+        res.status(500).send('Error al guardar la temperatura');
+    }
 });
 
 
