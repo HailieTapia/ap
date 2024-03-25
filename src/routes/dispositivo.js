@@ -52,8 +52,8 @@ routerd.get('/dispositivo',(req,res)=>{
     .then(data=>res.json(data))
     .catch(error=>res.json({message:error}))
 })
-
-//buscar dispositivo
+//HHYfg
+//uscar dispositivo
 routerd.get('/dispositivo/:id',(req,res)=>{
     const {id}=req.params
     esquema.findById(id)
