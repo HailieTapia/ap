@@ -33,30 +33,11 @@ routerd.get('/dispositivo/:id',(req,res)=>{
     .catch(error=>res.json({message:error}))
 }) 
 
-//actualizar dispositivo
-// Actualizar dispositivo
-
-routerd.put('/dispositivo/:id', async (req, res) => {
-    const { id } = req.params;
-    const { estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
-    try {
-        await esquema.findByIdAndUpdate(id, {
-          estadoFoco,
-          estadoCerradura,
-          estadoVentilador,
-          estadoVentilador2
-        }, { new: true });
-
-        // Publicar el estado actualizado al topic MQTT
-        if(estadoFoco !== undefined) client.publish('Entrada/01', estadoFoco ? "focoOn" : "focoOff");
-        if(estadoCerradura !== undefined) client.publish('Entrada/01', estadoCerradura ? "cerraduraOpen" : "cerraduraClose");
-        if(estadoVentilador !== undefined) client.publish('Entrada/01', estadoVentilador ? "ventiladorOn" : "ventiladorOff");
-        if(estadoVentilador2 !== undefined) client.publish('Entrada/01', estadoVentilador2 ? "ventilador2On" : "ventilador2Off");
-
-        res.json({ message: "Dispositivo actualizado y mensaje MQTT enviado." });
-    } catch (error) {
-        res.status(500).json({ message: error.message });
-    }
+routerd.post('/dispositivo/temperatura', async (req, res) => {
+    const { temperatura } = req.body;
+    // Guarda la temperatura en la base de datos o haz lo que necesites con ella
+    console.log('Temperatura recibida:', temperatura);
+    res.status(200).send('Temperatura recibida con éxito');
 });
 
 // Nuevo endpoint para enviar comandos a dispositivos específicos
