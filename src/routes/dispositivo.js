@@ -54,6 +54,23 @@ routerd.delete('/dispositivo/:id', (req, res) => {
     .catch(error => res.json({message: error}));
 });
 
+
+
+
+
+
+
+router.post('/dispositivo/temperatura', async (req, res) => {
+    const { temperatura } = req.body;
+    console.log('Temperatura recibida en el servidor:', temperatura); // Agregar este registro para verificar la temperatura recibida en el servidor
+    res.status(200).send('Temperatura recibida con éxito');
+});
+
+router.post('/dispositivo/humedad', async (req, res) => {
+    const { humedad } = req.body;
+    console.log('Humedad recibida en el servidor:', humedad); // Agregar este registro para verificar la humedad recibida en el servidor
+    res.status(200).send('Humedad recibida con éxito');
+});
 routerd.post('/dispositivo/datos-sensor', async (req, res) => {
     try {
         // Extraer los datos del cuerpo de la solicitud
