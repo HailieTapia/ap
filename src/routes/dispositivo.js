@@ -26,7 +26,11 @@ client.on('message', (topic, message) => {
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
             temperatura: estado.temperatura ,// Agregamos la temperatura
-            humedad: estado.humedad // Agregamos la temperatura
+            humedad: estado.humedad, // Agregamos la temperatura
+            estadoFoco: estado.estadoFoco,
+            estadoCerradura: estado.estadoCerradura,
+            estadoVentilador: estado.estadoVentilador,
+            estadoVentilador2: estado.estadoVentilador2
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
