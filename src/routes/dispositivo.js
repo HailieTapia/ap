@@ -16,9 +16,9 @@ client.on('connect', () => {
         }
     });
 });
-
+//ghghg
 client.on('message', (topic, message) => {
-    // Suponiendo que el topic es "dispensador/estado"
+    // Suponiendo que el topic es "dispensador/estadjhjo"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
         const dispositivoId = "65ff5db2656ceb696b6022da"; // Asumiendo un ID de dispositivo fijo para el ejemplo
