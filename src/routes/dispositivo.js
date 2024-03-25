@@ -26,8 +26,8 @@ client.on('message', (topic, message) => {
             estadoCerradura: estado.cerraduraOpen,
             estadoVentilador: estado.ventiladorOn,
             estadoVentilador2: estado.ventilador2On,
-            temperatura: estado.temperatura,
-            humedad: estado.humedad
+            temperatura: estado.temp,
+            humedad: estado.hum
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
