@@ -21,7 +21,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "Entrada/01/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "6601469adcb5bc45446997ba"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "66014fded1838eb3f70e0217"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         Dispositivo.updateOne({ _id: dispositivoId }, {
@@ -83,7 +83,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "6601469adcb5bc45446997ba";
+    const dispositivoIdValido = "66014fded1838eb3f70e0217";
 
     //LA LOGICA APLICADA AQUI PARA VERIFICAR EL ID, LO VAMOS A OCUPAR 
     //PARA VERIFICAR SI EL DISPOSITIVO COINCIDE CON ALGUNA QUE TENGA EL USUARIO
