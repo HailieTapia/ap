@@ -10,7 +10,7 @@ const routerd=express.Router()
 
 
 client.on('connect', () => {
-    client.subscribe('Entrada/01/estado', (err) => {
+    client.subscribe('dispensador/01/estado', (err) => {
         if (!err) {
             console.log("Subscrito con éxito al topic del estado del dispensador");
         }
@@ -19,7 +19,7 @@ client.on('connect', () => {
 
 client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
-    if (topic === "Entrada/01/estado") {
+    if (topic === "dispensador/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
         const dispositivoId = "65fd3f2f52b794079f541595"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
