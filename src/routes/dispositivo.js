@@ -7,6 +7,34 @@ const client = mqtt.connect('mqtt://broker.emqx.io:1883');
 
 const routerd=express.Router()
 
+client.on('connect', () => {
+    client.subscribe('Entrada/01', (err) => {
+        if (!err) {
+            console.log("Subscrito con éxito al topic del estado del dispositivo");
+        }
+    });
+});
+
+client.on('message', (topic, message) => {
+    if (topic === "Entrada/01") {
+        const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
+        const dispositivoId = "65ff5db2656ceb696b6022da"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+
+        // Actualizar la base de datos con los nuevos estados
+        Dispositivo.updateOne({_id: dispositivoId}, {$set: { 
+            estadoFoco: estado.focoOn,
+            estadoCerradura: estado.cerraduraOpen,
+            estadoVentilador: estado.ventiladorOn,
+            estadoVentilador2: estado.ventilador2On,
+            temperatura: estado.temperatura,
+            humedad: estado.humedad
+        }})
+        .then(result => console.log("Actualización exitosa", result))
+        .catch(error => console.error("Error al actualizar el dispositivo", error));
+    }
+});
+
+
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
 })
@@ -46,11 +74,12 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo (si necesario para lógica específica)
     const { comando } = req.body; // Asume que el comando viene en el cuerpo de la solicitud
 
-    // Aquí deberías tener alguna lógica para asegurarte de que el comando y el ID son válidos
-    // Por ejemplo, verificar que el dispositivo existe, que el comando es soportado, etc.
+    const dispositivoIdValido = "65ff5db2656ceb696b6022da";
 
-    // Publicar el comando al topic MQTT
-    // Asegúrate de publicar al topic correcto y formatear el mensaje según lo espera tu dispositivo
+    if (id !== dispositivoIdValido) {
+        // Si el ID no coincide, enviar una respuesta de error
+        return res.status(400).json({ message: "ID de dispositivo inválido." });
+    }
     client.publish('Entrada/01', comando, (error) => {
         if(error) {
             console.error("Error al publicar mensaje MQTT", error);
@@ -59,8 +88,6 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
         res.json({ message: "Comando enviado con éxito." });
     });
 });
-
-
 
 //eliminar dispositivo
 routerd.delete('/dispositivo/:id',(req,res)=>{
