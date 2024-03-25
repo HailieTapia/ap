@@ -54,13 +54,40 @@ routerd.delete('/dispositivo/:id', (req, res) => {
     .catch(error => res.json({message: error}));
 });
 
+
+
+
+
+
+
+router.post('/dispositivo/temperatura', async (req, res) => {
+    const { temperatura } = req.body;
+    console.log('Temperatura recibida en el servidor:', temperatura); // Agregar este registro para verificar la temperatura recibida en el servidor
+    res.status(200).send('Temperatura recibida con éxito');
+});
+
+router.post('/dispositivo/humedad', async (req, res) => {
+    const { humedad } = req.body;
+    console.log('Humedad recibida en el servidor:', humedad); // Agregar este registro para verificar la humedad recibida en el servidor
+    res.status(200).send('Humedad recibida con éxito');
+});
+
 routerd.post('/dispositivo/datos-sensor', async (req, res) => {
     try {
         // Extraer los datos del cuerpo de la solicitud
         const { nombre, temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
 
+        console.log('Datos de sensor recibidos en el servidor:');
+        console.log('Nombre:', nombre);
+        console.log('Temperatura:', temperatura);
+        console.log('Humedad:', humedad);
+        console.log('Estado del foco:', estadoFoco);
+        console.log('Estado de la cerradura:', estadoCerradura);
+        console.log('Estado del ventilador:', estadoVentilador);
+        console.log('Estado del ventilador 2:', estadoVentilador2);
+
         // Crear una nueva instancia del modelo Dispositivo con los datos recibidos
-        const dispositivo = new esquema({ // Aquí estás utilizando 'esquema' en lugar de 'Dispositivo'
+        const dispositivo = new esquema({
             nombre,
             temperatura,
             humedad,
@@ -81,4 +108,5 @@ routerd.post('/dispositivo/datos-sensor', async (req, res) => {
         res.status(500).json({ message: 'Error interno del servidor al guardar los datos del sensor.' });
     }
 });
+
 module.exports = routerd;
