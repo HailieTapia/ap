@@ -16,28 +16,30 @@ client.on('connect', () => {
         }
     });
 });
-//ghghg
 client.on('message', (topic, message) => {
-    // Suponiendo que el topic es "dispensador/estadjhjo"
     if (topic === "Entrada/01/estado") {
-        const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "65ff5db2656ceb696b6022da"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const estado = JSON.parse(message.toString());
+        const dispositivoId = "65ff5db2656ceb696b6022da";
 
-        // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
-        temperatura: estado.temperatura,
-        humedad: estado.humedad,
-        estadoFoco: estado.estadoFoco ? "encendido" : "apagado",
-        estadoVentilador: estado.estadoVentilador ? "encendido" : "apagado",
-        estadoVentilador2: estado.estadoVentilador2 ? "encendido" : "apagado",
-        estadoCerradura: estado.estadoCerradura ? "abierta" : "cerrada"
-
-             // Asume un booleano para el botón de agua
+            temperatura: estado.temperatura,
+            humedad: estado.humedad,
+            estadoFoco: estado.estadoFoco ? "encendido" : "apagado",
+            estadoVentilador: estado.estadoVentilador ? "encendido" : "apagado",
+            estadoVentilador2: estado.estadoVentilador2 ? "encendido" : "apagado",
+            estadoCerradura: estado.estadoCerradura ? "abierta" : "cerrada"
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
+
+routerd.post('/dispositivo/temperatura', async (req, res) => {
+    const { temperatura } = req.body;
+    console.log('Temperatura recibida:', temperatura);
+    res.status(200).send('Temperatura recibida con éxito');
+});
+
 routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
