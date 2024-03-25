@@ -7,7 +7,7 @@ const client = mqtt.connect('mqtt://broker.emqx.io:1883');
 
 const routerd=express.Router()
 
-//perro
+
 
 client.on('connect', () => {
     client.subscribe('Entrada/01/estado', (err) => {
@@ -18,23 +18,25 @@ client.on('connect', () => {
 });
 
 client.on('message', (topic, message) => {
-    // Suponiendo que el topic es "Entrada/01/estado"
+    // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "66014fded1838eb3f70e0217"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "6601469adcb5bc45446997ba"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
-        Dispositivo.updateOne({ _id: dispositivoId }, {
-            $set: {
-                temperatura: estado.temperatura,
-                humedad: estado.humedad,
-                estadoFoco: estado.estadoFoco,
-                estadoCerradura: estado.estadoCerradura,
-                estadoVentilador: estado.estadoVentilador
-            }
-        })
-            .then(result => console.log("Actualización exitosa", result))
-            .catch(error => console.error("Error al actualizar el dispositivo", error));
+        esquema.updateOne({_id: dispositivoId}, {$set: { 
+            led: estado.bombaEncendida ? "encendido" : "apagado",
+            pesoAlimento: estado.peso,
+            dispensando: estado.dispensando ? "si" : "no",
+            // Suponiendo que tienes campos para nivel de alimento, nivel de agua, y si los botones están activos
+            nivelAlimento: estado.nivelAlimento, // Asume que este valor se envía desde el Arduino
+            nivelAgua: estado.nivelAgua, // Asume que este valor también se envía desde el Arduino
+            botonAlimento: estado.botonAlimento ? "presionado" : "no presionado", // Asume un booleano para el botón de alimento
+            botonAgua: estado.botonAgua ? "presionado" : "no presionado", // Asume un booleano para el botón de agua
+            temperatura: estado.temperatura // Agregamos la temperatura
+        }})
+        .then(result => console.log("Actualización exitosa", result))
+        .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
 
@@ -83,11 +85,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "66014fded1838eb3f70e0217";
-
-    //LA LOGICA APLICADA AQUI PARA VERIFICAR EL ID, LO VAMOS A OCUPAR 
-    //PARA VERIFICAR SI EL DISPOSITIVO COINCIDE CON ALGUNA QUE TENGA EL USUARIO
-
+    const dispositivoIdValido = "6601469adcb5bc45446997ba";
 
     // Verificar que el ID del dispositivo es el esperado
     if (id !== dispositivoIdValido) {
