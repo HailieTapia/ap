@@ -13,26 +13,29 @@ client.on('connect', () => {
     client.subscribe('Entrada/01/estado', (err) => {
         if (!err) {
             console.log("Subscrito con éxito al topic del estado del dispensador");
+            client.subscribe('Entrada/01/estado'); // Cambia el topic según tu configuración
         }
     });
 });
 client.on('message', (topic, message) => {
-    if (topic === "Entrada/01/estado") {
+    if (topic === "Entrada/01/estado") { // Verifica el topic recibido
         const estado = JSON.parse(message.toString());
+
         const dispositivoId = "65ff5db2656ceb696b6022da";
 
         esquema.updateOne({_id: dispositivoId}, {$set: { 
-            temperatura: estado.temperatura,
-            humedad: estado.humedad,
-            estadoFoco: estado.estadoFoco ? "encendido" : "apagado",
-            estadoVentilador: estado.estadoVentilador ? "encendido" : "apagado",
-            estadoVentilador2: estado.estadoVentilador2 ? "encendido" : "apagado",
-            estadoCerradura: estado.estadoCerradura ? "abierta" : "cerrada"
+            temperatura: estado.temp, // Corrige el acceso al campo temperatura
+            humedad: estado.hum, // Corrige el acceso al campo humedad
+            estadoFoco: estado.foco ? "encendido" : "apagado", // Corrige el acceso al campo foco
+            estadoVentilador: estado.ventilador ? "encendido" : "apagado", // Corrige el acceso al campo ventilador
+            estadoVentilador2: estado.ventilador2 ? "encendido" : "apagado", // Corrige el acceso al campo ventilador2
+            estadoCerradura: estado.cerradura ? "abierta" : "cerrada" // Corrige el acceso al campo cerradura
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
+
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
