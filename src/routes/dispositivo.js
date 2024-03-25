@@ -54,4 +54,31 @@ routerd.delete('/dispositivo/:id', (req, res) => {
     .catch(error => res.json({message: error}));
 });
 
+routerd.post('/dispositivo/datos-sensor', async (req, res) => {
+    try {
+        // Extraer los datos del cuerpo de la solicitud
+        const { nombre, temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
+
+        // Crear una nueva instancia del modelo Dispositivo con los datos recibidos
+        const dispositivo = new esquema({ // Aquí estás utilizando 'esquema' en lugar de 'Dispositivo'
+            nombre,
+            temperatura,
+            humedad,
+            estadoFoco,
+            estadoCerradura,
+            estadoVentilador,
+            estadoVentilador2
+        });
+
+        // Guardar el dispositivo en la base de datos
+        await dispositivo.save();
+
+        // Respuesta exitosa
+        res.status(201).json({ message: 'Datos del sensor almacenados correctamente.' });
+    } catch (error) {
+        // Error al guardar los datos del sensor
+        console.error('Error al guardar los datos del sensor:', error);
+        res.status(500).json({ message: 'Error interno del servidor al guardar los datos del sensor.' });
+    }
+});
 module.exports = routerd;
