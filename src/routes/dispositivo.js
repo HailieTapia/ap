@@ -59,7 +59,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     });
 });
 
-
+//hola
 
 //eliminar dispositivo
 routerd.delete('/dispositivo/:id',(req,res)=>{
