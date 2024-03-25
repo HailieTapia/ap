@@ -19,7 +19,7 @@ client.on('message', (topic, message) => {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
 
         // Actualizar la base de datos con los nuevos estados
-        esquema.findOneAndUpdate({ nombre: estado.nombre }, { 
+        esquema.findByIdAndUpdate("65ff5db2656ceb696b6022da", { 
             estadoFoco: estado.estadoFoco,
             estadoCerradura: estado.estadoCerradura,
             estadoVentilador: estado.estadoVentilador,
@@ -27,11 +27,18 @@ client.on('message', (topic, message) => {
             temperatura: estado.temperatura,
             humedad: estado.humedad,
             fechaHora: new Date(estado.fechaHora)
-        }, { new: true, upsert: true })
-        .then(result => console.log("Actualización exitosa", result))
+        }, { new: true })
+        .then(result => {
+            if (result) {
+                console.log("Actualización exitosa", result);
+            } else {
+                console.log("Dispositivo no encontrado");
+            }
+        })
         .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
+
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
