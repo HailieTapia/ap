@@ -21,7 +21,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "660223803a3ca77d1ac51d0f"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
@@ -72,7 +72,7 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
-    const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+    const dispositivoId = "660223803a3ca77d1ac51d0f"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
     try {
         // Guarda la temperatura en la base de datos
