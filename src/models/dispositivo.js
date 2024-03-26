@@ -7,7 +7,6 @@ const dispositivoSchema = mongoose.Schema({
     estadoCerradura: { type: String, required: false }, // Campo estadoCerradura
     estadoVentilador: { type: String, required: false }, // Campo estadoVentilador
     estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
-    motor: { type: String, required: false } // Campo motor
 });
 
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
