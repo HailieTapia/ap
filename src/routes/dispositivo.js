@@ -28,7 +28,7 @@ client.on('message', (topic, message) => {
             temperatura: estado.temperatura,
             humedad: estado.humedad,
             estadoFoco: estado.foco,
-            estadoCerradura: estado.estadoCerradura,
+            estadoCerradura: estado.cerradura,
             estadoVentilador: estado.estadoVentilador,
             estadoVentilador2: estado.estadoVentilador2
         }})
