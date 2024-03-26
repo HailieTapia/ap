@@ -18,34 +18,26 @@ client.on('connect', () => {
 });
 
 client.on('message', (topic, message) => {
-    // Suponiendo que el topic es "Entrada/01/estado"
+    // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
+        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
-        Dispositivo.findOneAndUpdate(
-            { /* Filtros de búsqueda */ },
-            { 
-                temperatura: estado.temperatura,
-                humedad: estado.humedad,
-                estadoFoco: estado.estadoFoco,
-                estadoCerradura: estado.estadoCerradura,
-                estadoVentilador: estado.estadoVentilador,
-                estadoVentilador2: estado.estadoVentilador2,
-                motor: estado.motor // Agregar el estado del motor
-            },
-            { new: true } // Devolver el nuevo documento actualizado
-        )
-        .then(dispositivoActualizado => {
-            if (dispositivoActualizado) {
-                console.log("Dispositivo actualizado:", dispositivoActualizado);
-            } else {
-                console.log("Dispositivo no encontrado");
-            }
-        })
-        .catch(error => console.error("Error al actualizar el dispositivo:", error));
+        esquema.updateOne({_id: dispositivoId}, {$set: { 
+            temperatura: estado.temperatura,
+            humedad: estado.humedad,
+            estadoFoco: estado.estadoFoco,
+            estadoCerradura: estado.estadoCerradura,
+            estadoVentilador: estado.estadoVentilador,
+            estadoVentilador2: estado.estadoVentilador2,
+            motor: estado.motor // Agregar el estado del motor
+        }})
+        .then(result => console.log("Actualización exitosa", result))
+        .catch(error => console.error("Error al actualizar el dispositivo", error));
     }
 });
+
 
 
 
