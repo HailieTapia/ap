@@ -27,7 +27,7 @@ client.on('message', (topic, message) => {
         esquema.updateOne({_id: dispositivoId}, {$set: { 
             temperatura: estado.temperatura,
             humedad: estado.humedad,
-            estadoFoco: estado.estadoFoco,
+            estadoFoco: estado.foco,
             estadoCerradura: estado.estadoCerradura,
             estadoVentilador: estado.estadoVentilador,
             estadoVentilador2: estado.estadoVentilador2
