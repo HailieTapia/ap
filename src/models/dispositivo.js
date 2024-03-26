@@ -1,30 +1,14 @@
 const mongoose = require('mongoose');
 
-// Esquema para datos del dispositivo
-const dispositivoSchema = new mongoose.Schema({
-  nombre: {
-    type: String,
-    required: true
-  },
-  temperatura: {
-    type: Number,
-    required: true
-  },
-  humedad: {
-    type: Number,
-    required: true
-  },
-  estadoFoco: Boolean,
-  estadoCerradura: Boolean,
-  estadoVentilador: Boolean,
-  estadoVentilador2: Boolean,
-  fechaHora: {
-    type: Date,
-    default: Date.now
-  }
+const dispositivoSchema = mongoose.Schema({
+    temperatura: { type: Number, required: false }, // Campo temperatura
+    humedad: { type: Number, required: false }, // Campo humedad
+    estadoFoco: { type: String, required: false }, // Campo estadoFoco
+    estadoCerradura: { type: String, required: false }, // Campo estadoCerradura
+    estadoVentilador: { type: String, required: false }, // Campo estadoVentilador
+    estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
 });
 
-// Crear el modelo 'Dispositivo' usando el esquema definido anteriormente
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
 
 module.exports = Dispositivo;

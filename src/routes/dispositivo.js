@@ -7,6 +7,42 @@ const client = mqtt.connect('mqtt://broker.emqx.io:1883');
 
 const routerd=express.Router()
 
+
+
+client.on('connect', () => {
+    client.subscribe('Entrada/01/estado', (err) => {
+        if (!err) {
+            console.log("Subscrito con éxito al topic del estado del dispensador");
+        }
+    });
+});
+
+client.on('message', (topic, message) => {
+    // Suponiendo que el topic es "dispensador/estado"
+    if (topic === "Entrada/01/estado") {
+        const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
+        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+
+        // Actualizar la base de datos con los nuevos estados
+        esquema.updateOne({_id: dispositivoId}, {$set: { 
+            temperatura: estado.temperatura,
+            humedad: estado.humedad,
+            estadoFoco: estado.foco,
+            estadoCerradura: estado.cerradura,
+            estadoVentilador: estado.ventilador1,
+            estadoVentilador2: estado.ventilador2
+        }})
+        .then(result => console.log("Actualización exitosa", result))
+        .catch(error => console.error("Error al actualizar el dispositivo", error));
+    }
+});
+
+
+
+
+
+
+
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
 })
@@ -33,44 +69,42 @@ routerd.get('/dispositivo/:id',(req,res)=>{
     .catch(error=>res.json({message:error}))
 }) 
 
-//actualizar dispositivo
-// Actualizar dispositivo
+routerd.post('/dispositivo/temperatura', async (req, res) => {
+    const { temperatura } = req.body;
+    const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
-routerd.put('/dispositivo/:id', async (req, res) => {
-    const { id } = req.params;
-    const { estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
     try {
-        await esquema.findByIdAndUpdate(id, {
-          estadoFoco,
-          estadoCerradura,
-          estadoVentilador,
-          estadoVentilador2
-        }, { new: true });
+        // Guarda la temperatura en la base de datos
+        await esquema.updateOne({ _id: dispositivoId }, { $set: { temperatura } });
+        
+        // Envia la temperatura al cliente a través de WebSockets o SSE
+        // Ejemplo usando WebSocket: ws.send(JSON.stringify({ temperatura }));
+        // Ejemplo usando SSE: sseMiddleware.send({ temperatura });
 
-        // Publicar el estado actualizado al topic MQTT
-        if(estadoFoco !== undefined) client.publish('Entrada/01', estadoFoco ? "focoOn" : "focoOff");
-        if(estadoCerradura !== undefined) client.publish('Entrada/01', estadoCerradura ? "cerraduraOpen" : "cerraduraClose");
-        if(estadoVentilador !== undefined) client.publish('Entrada/01', estadoVentilador ? "ventiladorOn" : "ventiladorOff");
-        if(estadoVentilador2 !== undefined) client.publish('Entrada/01', estadoVentilador2 ? "ventilador2On" : "ventilador2Off");
-
-        res.json({ message: "Dispositivo actualizado y mensaje MQTT enviado." });
+        res.status(200).send('Temperatura recibida con éxito');
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        console.error("Error al guardar la temperatura:", error);
+        res.status(500).send('Error al guardar la temperatura');
     }
 });
 
+
 // Nuevo endpoint para enviar comandos a dispositivos específicos
 routerd.post('/dispositivo/comando/:id', (req, res) => {
-    const { id } = req.params; // ID del dispositivo (si necesario para lógica específica)
-    const { comando } = req.body; // Asume que el comando viene en el cuerpo de la solicitud
+    const { id } = req.params; // ID del dispositivo
+    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    // Aquí deberías tener alguna lógica para asegurarte de que el comando y el ID son válidos
-    // Por ejemplo, verificar que el dispositivo existe, que el comando es soportado, etc.
+    const dispositivoIdValido = "66019909c4c14782c2a61628";
 
-    // Publicar el comando al topic MQTT
-    // Asegúrate de publicar al topic correcto y formatear el mensaje según lo espera tu dispositivo
+    // Verificar que el ID del dispositivo es el esperado
+    if (id !== dispositivoIdValido) {
+        // Si el ID no coincide, enviar una respuesta de error
+        return res.status(400).json({ message: "ID de dispositivo inválido." });
+    }
+
+    // Si el ID es válido, proceder a publicar el comando al topic MQTT
     client.publish('Entrada/01', comando, (error) => {
-        if(error) {
+        if (error) {
             console.error("Error al publicar mensaje MQTT", error);
             return res.status(500).json({ message: "Error al enviar comando MQTT." });
         }
