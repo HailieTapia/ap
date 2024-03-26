@@ -9,7 +9,11 @@ const empresaSchema = mongoose.Schema(
         politicas: { type: String, require: true },
         terminos: { type: String, require: true },
         privacidad: { type: String, require: true },
-        contacto: { type: String, require: true },
+        correo: { type: String, require: true },
+        telefono: { type: String, require: true },
+        direccion: { type: String, require: true },
+        mensaje: { type: String, require: true },
+
     }
 )
 module.exports = mongoose.model('empresa', empresaSchema)
