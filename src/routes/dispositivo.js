@@ -38,11 +38,6 @@ client.on('message', (topic, message) => {
 });
 
 
-
-
-
-
-
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
 })
@@ -92,7 +87,7 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
 // Nuevo endpoint para enviar comandos a dispositivos específicos
 routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
-    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+    const { comando, fecha } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
 
     const dispositivoIdValido = "66019909c4c14782c2a61628";
 
@@ -108,7 +103,19 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
             console.error("Error al publicar mensaje MQTT", error);
             return res.status(500).json({ message: "Error al enviar comando MQTT." });
         }
-        res.json({ message: "Comando enviado con éxito." });
+
+        // Guardar el comando y la fecha en la base de datos
+        esquema.updateOne(
+            { _id: id }, 
+            { $set: { ultimoComando: comando, fechaUltimoComando: fecha } }, // Guarda el comando y la fecha
+            (error, result) => {
+                if (error) {
+                    console.error("Error al guardar el comando y la fecha en la base de datos:", error);
+                    return res.status(500).json({ message: "Error al guardar el comando y la fecha en la base de datos." });
+                }
+                res.json({ message: "Comando enviado con éxito." });
+            }
+        );
     });
 });
 

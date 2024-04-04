@@ -7,7 +7,9 @@ const dispositivoSchema = mongoose.Schema({
     estadoCerradura: { type: String, required: false }, // Campo estadoCerradura
     estadoVentilador: { type: String, required: false }, // Campo estadoVentilador
     estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
+    fechaUltimoComando: { type: Date, required: false }, // Campo para almacenar la fecha y hora del último comando
 });
+
 
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
 
