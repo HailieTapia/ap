@@ -81,28 +81,28 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
 });
 
 
-// Nuevo endpoint para enviar comandos a dispositivos específicos
-routerd.post('/dispositivo/comando/:id', (req, res) => {
+routerd.post('/dispositivo/comando/:id', async (req, res) => {
     const { id } = req.params; // ID del dispositivo
-    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+    const { comando, fecha } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "66019909c4c14782c2a61628";
-
-    // Verificar que el ID del dispositivo es el esperado
-    if (id !== dispositivoIdValido) {
-        // Si el ID no coincide, enviar una respuesta de error
-        return res.status(400).json({ message: "ID de dispositivo inválido." });
-    }
-
-    // Si el ID es válido, proceder a publicar el comando al topic MQTT
-    client.publish('Entrada/01', comando, (error) => {
-        if (error) {
-            console.error("Error al publicar mensaje MQTT", error);
-            return res.status(500).json({ message: "Error al enviar comando MQTT." });
+    try {
+        // Guardar la fecha y hora del comando en la base de datos
+        const dispositivo = await esquema.findById(id);
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
-        res.json({ message: "Comando enviado con éxito." });
-    });
+        dispositivo.fechaUltimoComando = fecha;
+        await dispositivo.save();
+        
+        // Publicar el comando al dispositivo a través de MQTT u otras acciones necesarias
+        
+        return res.status(200).json({ message: "Comando enviado con éxito." });
+    } catch (error) {
+        console.error("Error al enviar el comando:", error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
 });
+
 
 
 
