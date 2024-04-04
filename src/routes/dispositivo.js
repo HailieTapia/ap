@@ -21,7 +21,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
@@ -34,6 +34,30 @@ client.on('message', (topic, message) => {
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
+    }
+});
+
+routerd.post('/dispositivo/moverhuevos', async (req, res) => {
+    try {
+        const fechaHora = new Date(); // Obtiene la fecha y hora actual
+        const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+
+        // Encuentra el dispositivo correspondiente (si es necesario)
+        const dispositivo = await esquema.findById(dispositivoId);
+
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
+        }
+
+        // Actualiza la base de datos con el momento de mover huevos
+        es.momentoMoverHuevos = fechaHora;
+        await dispositivo.save();
+
+        // Responde al cliente
+        return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
+    } catch (error) {
+        console.error('Error al almacenar el momento de mover huevos:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
 
@@ -66,7 +90,7 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
-    const dispositivoId = "66019909c4c14782c2a61628"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+    const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
     try {
         // Guarda la temperatura en la base de datos
@@ -89,7 +113,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "66019909c4c14782c2a61628";
+    const dispositivoIdValido = "660e0051406da984316b92de";
 
     // Verificar que el ID del dispositivo es el esperado
     if (id !== dispositivoIdValido) {
