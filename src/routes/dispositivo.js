@@ -54,8 +54,16 @@ routerd.post('/dispositivo/moverhuevos', async (req, res) => {
         }
 
         // Actualiza la base de datos con el momento de mover huevos
-        es.momentoMoverHuevos = fechaHora;
+        dispositivo.fechaMovimientoHuevos = fechaHora;
         await dispositivo.save();
+
+        // Almacena el movimiento de huevos en la tabla movimientohuevos
+        const movimientoHuevos = new MovimientoHuevos({
+            dispositivoId: dispositivo._id, // Asigna el ID del dispositivo
+            fechaMovimiento: fechaHora // Asigna la fecha y hora del movimiento de huevos
+            // Puedes agregar otros campos si es necesario
+        });
+        await movimientoHuevos.save();
 
         // Responde al cliente
         return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
@@ -64,6 +72,7 @@ routerd.post('/dispositivo/moverhuevos', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
 
 
 routerd.get('/dispositivo/prueba',(req,res)=>{

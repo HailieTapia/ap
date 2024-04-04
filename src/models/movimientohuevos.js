@@ -6,6 +6,6 @@ const movimientoHuevosSchema = mongoose.Schema({
     // Otros campos si es necesario
 });
 
-const MovimientoHuevos = mongoose.model('MovimientoHuevos', movimientoHuevosSchema);
+const MovimientoHuevos = mongoose.model('movimientohuevos', movimientoHuevosSchema);
 
 module.exports = MovimientoHuevos;
