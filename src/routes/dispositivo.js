@@ -104,10 +104,6 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     });
 });
 
-
-
-
-//eliminar dispositivo
 routerd.delete('/dispositivo/:id',(req,res)=>{
     const{id}=req.params;
     esquema.deleteOne({_id:id})
