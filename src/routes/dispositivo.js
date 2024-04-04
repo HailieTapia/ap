@@ -43,7 +43,7 @@ client.on('message', async (topic, message) => {
             // Crear un nuevo registro de movimiento de huevos
             const movimientoHuevos = new MovimientoHuevos({
                 dispositivoId: dispositivoId,
-                fechaMovimiento: new Date()
+                fechaMovimiento: new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" }),
             });
 
             // Guardar el registro de movimiento de huevos en la base de datos
