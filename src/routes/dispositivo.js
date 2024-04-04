@@ -107,9 +107,22 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             
             // Si el comando indica un movimiento de huevos, registra la fecha y hora del movimiento
             if (comando === 'moverHuevos') {
-                // Actualiza la base de datos con el momento de mover huevos
-                dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
-                await dispositivo.save();
+                try {
+                    // Actualiza la base de datos con el momento de mover huevos
+                    dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
+                    await dispositivo.save();
+
+                    // Crea un nuevo registro en la tabla MovimientoHuevos
+                    const movimientoHuevos = new MovimientoHuevos({
+                        dispositivoId: id,
+                        fechaMovimiento: fechaHoraMexico
+                    });
+
+                    await movimientoHuevos.save();
+                } catch (error) {
+                    console.error('Error al guardar el movimiento de huevos:', error);
+                    return res.status(500).json({ error: 'Error interno del servidor' });
+                }
             }
 
             res.json({ message: "Comando enviado con éxito." });
@@ -119,6 +132,7 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
 
 
 
