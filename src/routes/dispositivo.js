@@ -91,39 +91,43 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 
 
-const { id } = req.params; // ID del dispositivo
-const { comando, fechaMovimientoHuevos } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
+routerd.post('/dispositivo/comando/:id', async (req, res) => {
+    try {
+        const { id } = req.params; // ID del dispositivo
+        const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+        const fechaHora = new Date(); // Obtiene la fecha y hora actual
 
-const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
+        const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
 
-// Verificar que el ID del dispositivo es el esperado
-if (id !== dispositivoIdValido) {
-    // Si el ID no coincide, enviar una respuesta de error
-    return res.status(400).json({ message: "ID de dispositivo inválido." });
-}
+        // Verificar que el ID del dispositivo es el esperado
+        if (id !== dispositivoIdValido) {
+            // Si el ID no coincide, enviar una respuesta de error
+            return res.status(400).json({ message: "ID de dispositivo inválido." });
+        }
 
-// Encuentra el dispositivo correspondiente en la base de datos
-const dispositivo = await esquema.findById(id);
+        // Encuentra el dispositivo correspondiente en la base de datos
+        const dispositivo = await esquema.findById(id);
 
-if (!dispositivo) {
-    return res.status(404).json({ error: 'Dispositivo no encontrado' });
-}
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
+        }
 
-// Ajustar la fecha y hora a la zona horaria de México
-const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos);
-fechaMovimientoHuevosMexico.toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+        // Actualiza la base de datos con el momento de mover huevos
+        dispositivo.fechaMovimientoHuevos = fechaHora;
+        await dispositivo.save();
 
-// Actualiza la base de datos con la fecha y hora ajustadas
-dispositivo.fechaMovimientoHuevos = fechaMovimientoHuevosMexico;
-await dispositivo.save();
-
-// Publica el comando al topic MQTT
-client.publish('Entrada/01', comando, (error) => {
-    if (error) {
-        console.error("Error al publicar mensaje MQTT", error);
-        return res.status(500).json({ message: "Error al enviar comando MQTT." });
+        // Publica el comando al topic MQTT
+        client.publish('Entrada/01', comando, (error) => {
+            if (error) {
+                console.error("Error al publicar mensaje MQTT", error);
+                return res.status(500).json({ message: "Error al enviar comando MQTT." });
+            }
+            res.json({ message: "Comando enviado con éxito." });
+        });
+    } catch (error) {
+        console.error('Error al enviar comando al dispositivo:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
-    res.json({ message: "Comando enviado con éxito." });
 });
 
 
