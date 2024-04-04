@@ -95,8 +95,13 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
         const { id } = req.params; // ID del dispositivo
         const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
-        const fechaHora = new Date(); // Obtiene la fecha y hora actual
-
+        
+        // Obtener la fecha y hora actual en la zona horaria de México
+        const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+        
+        // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
+        const fechaHoraMexico = new Date(fechaHora);
+        
         const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
 
         // Verificar que el ID del dispositivo es el esperado
@@ -113,7 +118,7 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         }
 
         // Actualiza la base de datos con el momento de mover huevos
-        dispositivo.fechaMovimientoHuevos = fechaHora;
+        dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
         await dispositivo.save();
 
         // Publica el comando al topic MQTT
@@ -129,6 +134,7 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
 
 
 
