@@ -41,38 +41,6 @@ client.on('message', (topic, message) => {
     }
 });
 
-routerd.post('/dispositivo/moverhuevos', async (req, res) => {
-    try {
-        const fechaHora = new Date(); // Obtiene la fecha y hora actual
-        const dispositivoId = "660e379b4afc98edd2c95ba1"; // Asumiendo un ID de dispositivo fijo para el ejemplo
-
-        // Encuentra el dispositivo correspondiente (si es necesario)
-        const dispositivo = await esquema.findById(dispositivoId);
-
-        if (!dispositivo) {
-            return res.status(404).json({ error: 'Dispositivo no encontrado' });
-        }
-
-        // Actualiza la base de datos con el momento de mover huevos
-        dispositivo.fechaMovimientoHuevos = fechaHora;
-        await dispositivo.save();
-
-        // Almacena el movimiento de huevos en la tabla movimientohuevos
-        const movimientoHuevos = new MovimientoHuevos({
-            dispositivoId: dispositivo._id, // Asigna el ID del dispositivo
-            fechaMovimiento: fechaHora // Asigna la fecha y hora del movimiento de huevos
-            // Puedes agregar otros campos si es necesario
-        });
-        await movimientoHuevos.save();
-
-        // Responde al cliente
-        return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
-    } catch (error) {
-        console.error('Error al almacenar el momento de mover huevos:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
-    }
-});
-
 
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
