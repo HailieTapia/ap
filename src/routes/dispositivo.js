@@ -107,12 +107,10 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
     }
 });
 
-
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
         const { id } = req.params; // ID del dispositivo
-        const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
-        const fechaHora = new Date(); // Obtiene la fecha y hora actual
+        const { comando, fechaMovimientoHuevos } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
 
         const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
 
@@ -123,14 +121,19 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         }
 
         // Encuentra el dispositivo correspondiente en la base de datos
-        const dispositivo = await esquema.findById(id);
+        const dispositivo = await Dispositivo.findById(id);
 
         if (!dispositivo) {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
-        // Actualiza la base de datos con el momento de mover huevos
-        dispositivo.fechaMovimientoHuevos = fechaHora;
+        // Ajusta la fecha y hora a la zona horaria de México
+        const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos);
+        // Opcionalmente, puedes hacerlo directamente en el cuerpo de la solicitud si ya viene en el formato deseado
+        // const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
+
+        // Actualiza la base de datos con la fecha y hora ajustadas
+        dispositivo.fechaMovimientoHuevos = fechaMovimientoHuevosMexico;
         await dispositivo.save();
 
         // Publica el comando al topic MQTT
