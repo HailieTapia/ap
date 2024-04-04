@@ -108,14 +108,22 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
 });
 
 
-// Nuevo endpoint para enviar comandos a dispositivos específicos
-routerd.post('/dispositivo/moverhuevos', async (req, res) => {
+routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
+        const { id } = req.params; // ID del dispositivo
+        const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
         const fechaHora = new Date(); // Obtiene la fecha y hora actual
-        const dispositivoId = "660e085a961df97cfea6de15"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
-        // Encuentra el dispositivo correspondiente (si es necesario)
-        const dispositivo = await esquema.findById(dispositivoId);
+        const dispositivoIdValido = "660e085a961df97cfea6de15";
+
+        // Verificar que el ID del dispositivo es el esperado
+        if (id !== dispositivoIdValido) {
+            // Si el ID no coincide, enviar una respuesta de error
+            return res.status(400).json({ message: "ID de dispositivo inválido." });
+        }
+
+        // Encuentra el dispositivo correspondiente en la base de datos
+        const dispositivo = await esquema.findById(id);
 
         if (!dispositivo) {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
@@ -125,10 +133,16 @@ routerd.post('/dispositivo/moverhuevos', async (req, res) => {
         dispositivo.fechaMovimientoHuevos = fechaHora;
         await dispositivo.save();
 
-        // Responde al cliente
-        return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
+        // Publica el comando al topic MQTT
+        client.publish('Entrada/01', comando, (error) => {
+            if (error) {
+                console.error("Error al publicar mensaje MQTT", error);
+                return res.status(500).json({ message: "Error al enviar comando MQTT." });
+            }
+            res.json({ message: "Comando enviado con éxito." });
+        });
     } catch (error) {
-        console.error('Error al almacenar el momento de mover huevos:', error);
+        console.error('Error al enviar comando al dispositivo:', error);
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
