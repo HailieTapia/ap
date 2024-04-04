@@ -21,7 +21,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "660e085a961df97cfea6de15"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
@@ -40,7 +40,7 @@ client.on('message', (topic, message) => {
 routerd.post('/dispositivo/moverhuevos', async (req, res) => {
     try {
         const fechaHora = new Date(); // Obtiene la fecha y hora actual
-        const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "660e085a961df97cfea6de15"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Encuentra el dispositivo correspondiente (si es necesario)
         const dispositivo = await esquema.findById(dispositivoId);
@@ -90,7 +90,7 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
-    const dispositivoId = "660e0051406da984316b92de"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+    const dispositivoId = "660e085a961df97cfea6de15"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
     try {
         // Guarda la temperatura en la base de datos
@@ -113,7 +113,7 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "660e0051406da984316b92de";
+    const dispositivoIdValido = "660e085a961df97cfea6de15";
 
     // Verificar que el ID del dispositivo es el esperado
     if (id !== dispositivoIdValido) {
