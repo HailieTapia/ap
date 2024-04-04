@@ -41,6 +41,29 @@ client.on('message', (topic, message) => {
     }
 });
 
+routerd.post('/dispositivo/moverhuevos', async (req, res) => {
+    try {
+        const fechaHora = new Date(); // Obtiene la fecha y hora actual
+        const dispositivoId = "660e379b4afc98edd2c95ba1"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+
+        // Encuentra el dispositivo correspondiente (si es necesario)
+        const dispositivo = await esquema.findById(dispositivoId);
+
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
+        }
+
+        // Actualiza la base de datos con el momento de mover huevos
+        es.momentoMoverHuevos = fechaHora;
+        await dispositivo.save();
+
+        // Responde al cliente
+        return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
+    } catch (error) {
+        console.error('Error al almacenar el momento de mover huevos:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
@@ -98,33 +121,16 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
+        // Actualiza la base de datos con el momento de mover huevos
+        dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
+        await dispositivo.save();
+
         // Publica el comando al topic MQTT
-        client.publish('Entrada/01', comando, async (error) => {
+        client.publish('Entrada/01', comando, (error) => {
             if (error) {
                 console.error("Error al publicar mensaje MQTT", error);
                 return res.status(500).json({ message: "Error al enviar comando MQTT." });
             }
-            
-            // Si el comando indica un movimiento de huevos, registra la fecha y hora del movimiento
-            if (comando === 'moverHuevos') {
-                try {
-                    // Actualiza la base de datos con el momento de mover huevos
-                    dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
-                    await dispositivo.save();
-
-                    // Crea un nuevo registro en la tabla MovimientoHuevos
-                    const movimientoHuevos = new MovimientoHuevos({
-                        dispositivoId: id,
-                        fechaMovimiento: fechaHoraMexico
-                    });
-
-                    await movimientoHuevos.save();
-                } catch (error) {
-                    console.error('Error al guardar el movimiento de huevos:', error);
-                    return res.status(500).json({ error: 'Error interno del servidor' });
-                }
-            }
-
             res.json({ message: "Comando enviado con éxito." });
         });
     } catch (error) {
@@ -132,7 +138,6 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
-
 
 
 
