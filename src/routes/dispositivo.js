@@ -94,8 +94,14 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
         const { id } = req.params; // ID del dispositivo
-        const { comando, fechaMovimientoHuevos } = req.body; // Comando y fechaMovimientoHuevos enviados en el cuerpo de la solicitud
-
+        const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+        
+        // Obtener la fecha y hora actual en la zona horaria de México
+        const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+        
+        // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
+        const fechaHoraMexico = new Date(fechaHora);
+        
         const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
 
         // Verificar que el ID del dispositivo es el esperado
@@ -111,11 +117,11 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
-        // Actualizar la base de datos con la fechaMovimientoHuevos
-        dispositivo.fechaMovimientoHuevos = new Date(fechaMovimientoHuevos); // Convertir la cadena de fecha y hora en un objeto Date
+        // Actualiza la base de datos con el momento de mover huevos
+        dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
         await dispositivo.save();
 
-        // Publicar el comando al topic MQTT
+        // Publica el comando al topic MQTT
         client.publish('Entrada/01', comando, (error) => {
             if (error) {
                 console.error("Error al publicar mensaje MQTT", error);
@@ -128,7 +134,6 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
-
 
 
 
