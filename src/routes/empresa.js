@@ -42,9 +42,9 @@ routerem.get('/empresas/categoria/:categoria',(req,res)=>{
 //actualizar producto
 routerem.put('/empresas/:id',(req,res)=>{
     const{id}=req.params;
-    const{descripcion,mision,vision,valores,politicas,terminos,privacidad,contacto}=req.body
+    const{descripcion,mision,vision,valores,politicas,terminos,privacidad,correo,telefono,direccion,mensaje}=req.body
     esquema
-    .updateOne({_id:id},{$set:{descripcion,mision,vision,valores,politicas,terminos,privacidad,contacto}})
+    .updateOne({_id:id},{$set:{descripcion,mision,vision,valores,politicas,terminos,privacidad,correo,telefono,direccion,mensaje}})
     .then((data)=>res.json(data))
     .catch((error)=>res.json({message:error}))
 })
