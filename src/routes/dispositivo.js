@@ -108,41 +108,32 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
 });
 
 
-routerd.post('/dispositivo/comando/:id', async (req, res) => {
-    const { id } = req.params; // ID del dispositivo
-    const { comando, fechaMovimientoHuevos } = req.body; // Comando y fecha de movimiento de los huevos
-
+// Nuevo endpoint para enviar comandos a dispositivos específicos
+routerd.post('/dispositivo/moverhuevos', async (req, res) => {
     try {
-        // Verifica si el dispositivo existe en la base de datos
-        const dispositivo = await Dispositivo.findById(id);
+        const fechaHora = new Date(); // Obtiene la fecha y hora actual
+        const dispositivoId = "660e085a961df97cfea6de15"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
-        // Si el dispositivo no existe, devuelve un error
+        // Encuentra el dispositivo correspondiente (si es necesario)
+        const dispositivo = await esquema.findById(dispositivoId);
+
         if (!dispositivo) {
-            return res.status(404).json({ message: "Dispositivo no encontrado." });
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
-        // Si la fecha de movimiento de huevos está presente, actualiza el dispositivo con la nueva fecha
-        if (fechaMovimientoHuevos) {
-            dispositivo.fechaMovimientoHuevos = fechaMovimientoHuevos;
-            await dispositivo.save();
-        }
+        // Actualiza la base de datos con el momento de mover huevos
+        dispositivo.fechaMovimientoHuevos = fechaHora;
+        await dispositivo.save();
 
-    // Aquí procederías a publicar el comando al topic MQTT como lo hacías antes
-     client.publish('Entrada/01', comando, (error) => {
-             if (error) {
-                console.error("Error al publicar mensaje MQTT", error);
-                return res.status(500).json({ message: "Error al enviar comando MQTT." });
-            }
-            res.json({ message: "Comando enviado con éxito." });
-         });
-
-        // En lugar de publicar el comando MQTT aquí, solo envía una respuesta exitosa
-        res.json({ message: "Comando almacenado con éxito." });
+        // Responde al cliente
+        return res.status(200).json({ message: 'Momento de mover huevos almacenado exitosamente' });
     } catch (error) {
-        console.error("Error al enviar comando al dispositivo:", error);
-        res.status(500).json({ message: "Error interno del servidor." });
+        console.error('Error al almacenar el momento de mover huevos:', error);
+        return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
+
 
 
 //eliminar dispositivo
