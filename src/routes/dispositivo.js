@@ -98,16 +98,20 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
-        // Actualiza la base de datos con el momento de mover huevos
-        dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
-        await dispositivo.save();
-
         // Publica el comando al topic MQTT
-        client.publish('Entrada/01', comando, (error) => {
+        client.publish('Entrada/01', comando, async (error) => {
             if (error) {
                 console.error("Error al publicar mensaje MQTT", error);
                 return res.status(500).json({ message: "Error al enviar comando MQTT." });
             }
+            
+            // Si el comando indica un movimiento de huevos, registra la fecha y hora del movimiento
+            if (comando === 'moverHuevos') {
+                // Actualiza la base de datos con el momento de mover huevos
+                dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
+                await dispositivo.save();
+            }
+
             res.json({ message: "Comando enviado con éxito." });
         });
     } catch (error) {
