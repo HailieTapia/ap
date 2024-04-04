@@ -66,15 +66,12 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.post('/dispositivo/temperatura', async (req, res) => {
     const { temperatura } = req.body;
-    const dispositivoId = "660dfa45b38653095450d92f"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+    const dispositivoId = "660dfa45b38653095450d92f"; 
 
     try {
         // Guarda la temperatura en la base de datos
         await esquema.updateOne({ _id: dispositivoId }, { $set: { temperatura } });
         
-        // Envia la temperatura al cliente a través de WebSockets o SSE
-        // Ejemplo usando WebSocket: ws.send(JSON.stringify({ temperatura }));
-        // Ejemplo usando SSE: sseMiddleware.send({ temperatura });
 
         res.status(200).send('Temperatura recibida con éxito');
     } catch (error) {
@@ -87,9 +84,9 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
 // Nuevo endpoint para enviar comandos a dispositivos específicos
 routerd.post('/dispositivo/comando/:id', (req, res) => {
     const { id } = req.params; // ID del dispositivo
-    const { comando, fecha } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
+    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
 
-    const dispositivoIdValido = "660dfa45b38653095450d92f";
+    const dispositivoIdValido = "66019909c4c14782c2a61628";
 
     // Verificar que el ID del dispositivo es el esperado
     if (id !== dispositivoIdValido) {
@@ -103,21 +100,10 @@ routerd.post('/dispositivo/comando/:id', (req, res) => {
             console.error("Error al publicar mensaje MQTT", error);
             return res.status(500).json({ message: "Error al enviar comando MQTT." });
         }
-
-        // Guardar el comando y la fecha en la base de datos
-        esquema.updateOne(
-            { _id: id }, 
-            { $set: { ultimoComando: comando, fechaUltimoComando: fecha } }, // Guarda el comando y la fecha
-            (error, result) => {
-                if (error) {
-                    console.error("Error al guardar el comando y la fecha en la base de datos:", error);
-                    return res.status(500).json({ message: "Error al guardar el comando y la fecha en la base de datos." });
-                }
-                res.json({ message: "Comando enviado con éxito." });
-            }
-        );
+        res.json({ message: "Comando enviado con éxito." });
     });
 });
+
 
 
 
