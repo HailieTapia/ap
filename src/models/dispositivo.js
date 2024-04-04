@@ -7,7 +7,7 @@ const dispositivoSchema = mongoose.Schema({
     estadoCerradura: { type: String, required: false }, // Campo estadoCerradura
     estadoVentilador: { type: String, required: false }, // Campo estadoVentilador
     estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
-    fechaMovimientoHuevos: { type: Date, required: false }, // Cenar la fecha y hora del último movimiento de huevos
+    fechaMovimientoHuevos: { type: String, required: false }, // Cenar la fecha y hora del último movimiento de huevos
 });
 
 

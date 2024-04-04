@@ -107,12 +107,12 @@ routerd.post('/dispositivo/temperatura', async (req, res) => {
     }
 });
 
-
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
         const { id } = req.params; // ID del dispositivo
         const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
         const fechaHora = new Date(); // Obtiene la fecha y hora actual
+        const horaMovimientoHuevos = formatHora(fechaHora); // Obtiene la hora del movimiento de huevos
 
         const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
 
@@ -129,8 +129,8 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             return res.status(404).json({ error: 'Dispositivo no encontrado' });
         }
 
-        // Actualiza la base de datos con el momento de mover huevos
-        dispositivo.fechaMovimientoHuevos = fechaHora;
+        // Actualiza la base de datos con la hora del movimiento de huevos
+        dispositivo.fechaMovimientoHuevos = horaMovimientoHuevos;
         await dispositivo.save();
 
         // Publica el comando al topic MQTT
@@ -146,7 +146,6 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
-
 
 
 
