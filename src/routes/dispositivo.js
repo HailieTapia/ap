@@ -102,6 +102,14 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
         await dispositivo.save();
 
+        // Almacena el movimiento de huevos en la tabla movimientohuevos
+        const movimientoHuevos = new MovimientoHuevos({
+            dispositivoId: id, // Asigna el ID del dispositivo
+            fechaMovimiento: fechaHoraMexico // Asigna la fecha y hora del movimiento de huevos
+            // Puedes agregar otros campos si es necesario
+        });
+        await movimientoHuevos.save();
+
         // Publica el comando al topic MQTT
         client.publish('Entrada/01', comando, (error) => {
             if (error) {
