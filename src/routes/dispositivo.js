@@ -2,12 +2,16 @@ const express=require('express')
 const esquema=require('../models/dispositivo')
 const mqtt = require('mqtt');
 const client = mqtt.connect('mqtt://broker.emqx.io:1883');  
-
+const MovimientoHuevos = require('../models/movimientohuevos');
 
 
 const routerd=express.Router()
 
 
+routerd.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send('Error interno del servidor');
+});
 
 client.on('connect', () => {
     client.subscribe('Entrada/01/estado', (err) => {
@@ -17,25 +21,41 @@ client.on('connect', () => {
     });
 });
 
-client.on('message', (topic, message) => {
+client.on('message', async (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
         const dispositivoId = "660e379b4afc98edd2c95ba1"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
-        // Actualizar la base de datos con los nuevos estados
-        esquema.updateOne({_id: dispositivoId}, {$set: { 
-            temperatura: estado.temperatura,
-            humedad: estado.humedad,
-            estadoFoco: estado.foco,
-            estadoCerradura: estado.cerradura,
-            estadoVentilador: estado.ventilador1,
-            estadoVentilador2: estado.ventilador2
-        }})
-        .then(result => console.log("Actualización exitosa", result))
-        .catch(error => console.error("Error al actualizar el dispositivo", error));
+        try {
+            // Actualizar la base de datos con los nuevos estados
+            await esquema.updateOne({ _id: dispositivoId }, {
+                $set: {
+                    temperatura: estado.temperatura,
+                    humedad: estado.humedad,
+                    estadoFoco: estado.foco,
+                    estadoCerradura: estado.cerradura,
+                    estadoVentilador: estado.ventilador1,
+                    estadoVentilador2: estado.ventilador2
+                }
+            });
+
+            // Crear un nuevo registro de movimiento de huevos
+            const movimientoHuevos = new MovimientoHuevos({
+                dispositivoId: dispositivoId,
+                fechaMovimiento: new Date()
+            });
+
+            // Guardar el registro de movimiento de huevos en la base de datos
+            await movimientoHuevos.save();
+
+            console.log("Actualización exitosa");
+        } catch (error) {
+            console.error("Error al actualizar el dispositivo o guardar el movimiento de huevos:", error);
+        }
     }
 });
+
 
 routerd.post('/dispositivo/moverhuevos', async (req, res) => {
     try {
