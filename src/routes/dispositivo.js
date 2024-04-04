@@ -88,66 +88,42 @@ routerd.get('/dispositivo/:id',(req,res)=>{
     .catch(error=>res.json({message:error}))
 }) 
 
-routerd.post('/dispositivo/temperatura', async (req, res) => {
-    const { temperatura } = req.body;
-    const dispositivoId = "660e379b4afc98edd2c95ba1"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
-    try {
-        // Guarda la temperatura en la base de datos
-        await esquema.updateOne({ _id: dispositivoId }, { $set: { temperatura } });
-        
-        // Envia la temperatura al cliente a través de WebSockets o SSE
-        // Ejemplo usando WebSocket: ws.send(JSON.stringify({ temperatura }));
-        // Ejemplo usando SSE: sseMiddleware.send({ temperatura });
 
-        res.status(200).send('Temperatura recibida con éxito');
-    } catch (error) {
-        console.error("Error al guardar la temperatura:", error);
-        res.status(500).send('Error al guardar la temperatura');
+
+const { id } = req.params; // ID del dispositivo
+const { comando, fechaMovimientoHuevos } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
+
+const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
+
+// Verificar que el ID del dispositivo es el esperado
+if (id !== dispositivoIdValido) {
+    // Si el ID no coincide, enviar una respuesta de error
+    return res.status(400).json({ message: "ID de dispositivo inválido." });
+}
+
+// Encuentra el dispositivo correspondiente en la base de datos
+const dispositivo = await esquema.findById(id);
+
+if (!dispositivo) {
+    return res.status(404).json({ error: 'Dispositivo no encontrado' });
+}
+
+// Ajustar la fecha y hora a la zona horaria de México
+const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos);
+fechaMovimientoHuevosMexico.toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+
+// Actualiza la base de datos con la fecha y hora ajustadas
+dispositivo.fechaMovimientoHuevos = fechaMovimientoHuevosMexico;
+await dispositivo.save();
+
+// Publica el comando al topic MQTT
+client.publish('Entrada/01', comando, (error) => {
+    if (error) {
+        console.error("Error al publicar mensaje MQTT", error);
+        return res.status(500).json({ message: "Error al enviar comando MQTT." });
     }
-});
-
-routerd.post('/dispositivo/comando/:id', async (req, res) => {
-    try {
-        const { id } = req.params; // ID del dispositivo
-        const { comando, fechaMovimientoHuevos } = req.body; // Comando y fecha enviados en el cuerpo de la solicitud
-
-        const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
-
-        // Verificar que el ID del dispositivo es el esperado
-        if (id !== dispositivoIdValido) {
-            // Si el ID no coincide, enviar una respuesta de error
-            return res.status(400).json({ message: "ID de dispositivo inválido." });
-        }
-
-        // Encuentra el dispositivo correspondiente en la base de datos
-        const dispositivo = await Dispositivo.findById(id);
-
-        if (!dispositivo) {
-            return res.status(404).json({ error: 'Dispositivo no encontrado' });
-        }
-
-        // Ajusta la fecha y hora a la zona horaria de México
-        const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos);
-        // Opcionalmente, puedes hacerlo directamente en el cuerpo de la solicitud si ya viene en el formato deseado
-        // const fechaMovimientoHuevosMexico = new Date(fechaMovimientoHuevos.toLocaleString("en-US", { timeZone: "America/Mexico_City" }));
-
-        // Actualiza la base de datos con la fecha y hora ajustadas
-        dispositivo.fechaMovimientoHuevos = fechaMovimientoHuevosMexico;
-        await dispositivo.save();
-
-        // Publica el comando al topic MQTT
-        client.publish('Entrada/01', comando, (error) => {
-            if (error) {
-                console.error("Error al publicar mensaje MQTT", error);
-                return res.status(500).json({ message: "Error al enviar comando MQTT." });
-            }
-            res.json({ message: "Comando enviado con éxito." });
-        });
-    } catch (error) {
-        console.error('Error al enviar comando al dispositivo:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
-    }
+    res.json({ message: "Comando enviado con éxito." });
 });
 
 
