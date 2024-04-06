@@ -25,7 +25,7 @@ client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
         const estado = JSON.parse(message.toString()); // Parsea el mensaje a JSON
-        const dispositivoId = "660e379b4afc98edd2c95ba1"; // Asumiendo un ID de dispositivo fijo para el ejemplo
+        const dispositivoId = "6610cfa2e02e153998505e65"; // Asumiendo un ID de dispositivo fijo para el ejemplo
 
         // Actualizar la base de datos con los nuevos estados
         esquema.updateOne({_id: dispositivoId}, {$set: { 
@@ -83,7 +83,7 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
         const fechaHoraMexico = new Date(fechaHora);
         
-        const dispositivoIdValido = "660e379b4afc98edd2c95ba1";
+        const dispositivoIdValido = "6610cfa2e02e153998505e65";
 
         // Verificar que el ID del dispositivo es el esperado
         if (id !== dispositivoIdValido) {
