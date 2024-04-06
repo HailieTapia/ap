@@ -10,7 +10,7 @@ const usuarioSchema = mongoose.Schema({
     preguntaRecuperacion: { type: String, require: true },
     respuestaPregunta: { type: String, require: true },
     codigoRecuperacion: { type: String },
-    dispositivos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dispositivo' }], // Referencia a dispositivosalanyhailiese aman 
+    dispositivos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dispositivo' }], // Hailie dame un beso
 });
 
 module.exports = mongoose.model('usuario', usuarioSchema);
