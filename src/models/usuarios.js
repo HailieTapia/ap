@@ -10,7 +10,7 @@ const usuarioSchema = mongoose.Schema({
     preguntaRecuperacion: { type: String, require: true },
     respuestaPregunta: { type: String, require: true },
     codigoRecuperacion: { type: String },
-    dispositivos: { type: String, require: true },
+    dispositivos: [{ type: String, required: true }], // Array de strings
 });
 
 module.exports = mongoose.model('usuario', usuarioSchema);
