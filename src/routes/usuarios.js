@@ -92,6 +92,8 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
     }
 });
 
+
+/////////////////////////////////////////////////////
 // Endpoint de inicio de sesión
 router.get('/usuarios/perfil', async (req, res) => {
     try {
@@ -150,6 +152,7 @@ router.post('/usuarios/login', async (req, res) => {
 });
 
 
+
 router.get('/usuarios/x', (req, res) => {
     res.json({ "response": "Prueba Users" })
 })
@@ -202,13 +205,14 @@ router.delete('/usuarios/:id', (req, res) => {
         .then(data => res.json(data))
         .catch(error => res.json({ message: error }))
 })
+
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: "proyeqtocuatri@gmail.com",
-        pass: "yijo yopr ejbk jguj",
+        user: "p36076220@gmail.com",
+        pass: "g j q a o h y x e x s z o f j p",
     },
 });
 // Endpoint para solicitar recuperación de contraseña
@@ -241,13 +245,13 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: "proyeqtocuatri@gmail.com",
-                pass: "yijo yopr ejbk jguj",
+                user: "p36076220@gmail.com",
+                pass: "g j q a o h y x e x s z o f j p",
             },
         });
 
         const mailOptions = {
-            from: 'proyeqtocuatri@gmail.com',
+            from: 'p36076220@gmail.com',
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
@@ -387,8 +391,3 @@ router.post('/usuarios/verificar-respuesta-seguridad', async (req, res) => {
 });
 
 module.exports = router;
-
-module.exports = router
-
-// process.env.JWT_SECRET_RECUPERACION
-// process.env.EMAIL_USERNAME
