@@ -3,13 +3,23 @@ const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const nodemailer = require('nodemailer');
 
+//modificaciones :
+
+
+const Usuario = require('../models/usuarios');
+const Dispositivo = require('../models/dispositivo');
+
+//////////////////////////////////////////////////////////////////
+
 const esquema = require('../models/usuarios')
 
 const router = express.Router()
 
+//agregue dos endpoints para control de dispositivos por id 
 
 
-
+//Endpoint para ver dispositivos de un usuarios 
+///////////////////////////////////////////////////////////////////////////////////////////////
 router.get('/usuarios/:userId/dispositivos', async (req, res) => {
     const { userId } = req.params;
 
@@ -24,6 +34,7 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los dispositivos.' });
     }
 });
+////////////////////////////////////////////////////////////////////////////////////////////////
 
 //Endpoint para asignar Dispositivos
 
@@ -80,9 +91,6 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
         res.status(500).json({ error: 'Error al obtener los dispositivos.' });
     }
 });
-
-
-
 
 
 /////////////////////////////////////////////////////
