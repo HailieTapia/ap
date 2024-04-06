@@ -12,7 +12,6 @@ const dispositivoSchema = mongoose.Schema({
     asignacion:{type:Boolean},  ///
 });
 
-
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
 
 module.exports = Dispositivo;
