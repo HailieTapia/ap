@@ -11,8 +11,7 @@ const usuarioSchema=mongoose.Schema(
     tipo: { type: String, require: true },
     preguntaRecuperacion: { type: String, require: true },
     respuestaPregunta: { type: String, require: true },
-    codigoRecuperacion: { type: String },
-    dispositivos: [{ type: Schema.Types.ObjectId, ref: 'Dispositivo' }], // Referencia a dispositivos
+    codigoRecuperacion: { type: String }
 });
 
 module.exports = mongoose.model('usuario', usuarioSchema);
