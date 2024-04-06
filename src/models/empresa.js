@@ -13,6 +13,7 @@ const empresaSchema = mongoose.Schema(
         telefono: { type: String, require: true },
         direccion: { type: String, require: true },
         mensaje: { type: String, require: true },
+        preguntasFrecuentes: [{ pregunta: String, respuesta: String }]
 
     }
 )

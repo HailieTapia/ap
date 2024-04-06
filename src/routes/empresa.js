@@ -1,60 +1,69 @@
-const express=require('express')
-const esquema=require('../models/empresa')
+const express = require('express');
+const empresaModel = require('../models/empresa');
 
-const routerem=express.Router()
+const routerem = express.Router();
 
+// Obtener todas las empresas
+routerem.get('/empresas', (req, res) => {
+    empresaModel.find()
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-routerem.get('/empresas/x', (req, res) => {
-    res.json({ "response": "Prueba empresa" })
-})
+// Crear una nueva empresa
+routerem.post('/empresas', (req, res) => {
+    const nuevaEmpresa = new empresaModel(req.body);
+    nuevaEmpresa.save()
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-routerem.post('/empresas',(req,res)=>{
-    const us= esquema(req.body);
-    us.save()
-    .then(data=>res.json(data))
-    .catch(error=>res.json({message:error}))
-})
+// Obtener una empresa por su ID
+routerem.get('/empresas/:id', (req, res) => {
+    const { id } = req.params;
+    empresaModel.findById(id)
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-//leer empresas
-routerem.get('/empresas',(req,res)=>{
-    esquema.find()
-    .then(data=>res.json(data))
-    .catch(error=>res.json({message:error}))
-})
+// Actualizar una empresa por su ID
+routerem.put('/empresas/:id', (req, res) => {
+    const { id } = req.params;
+    empresaModel.findByIdAndUpdate(id, req.body, { new: true })
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-//buscar producto
-routerem.get('/empresas/:id',(req,res)=>{
-    const {id}=req.params
-    esquema.findById(id)
-    .then(data=>res.json(data))
-    .catch(error=>res.json({message:error}))
-})
+// Eliminar una empresa por su ID
+routerem.delete('/empresas/:id', (req, res) => {
+    const { id } = req.params;
+    empresaModel.findByIdAndDelete(id)
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-//busqueda por el categoria
-routerem.get('/empresas/categoria/:categoria',(req,res)=>{
-    const {correo} = req.params
-    esquema.findOne({ correo })
-      .then(data => res.json(data))
-      .catch(error => res.json({message:error}))
-  })
-  
+// Agregar una pregunta frecuente a una empresa por su ID
+routerem.post('/empresas/:id/preguntas-frecuentes', (req, res) => {
+    const { id } = req.params;
+    empresaModel.findByIdAndUpdate(
+        id,
+        { $push: { preguntasFrecuentes: req.body } },
+        { new: true }
+    )
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-//actualizar producto
-routerem.put('/empresas/:id',(req,res)=>{
-    const{id}=req.params;
-    const{descripcion,mision,vision,valores,politicas,terminos,privacidad,correo,telefono,direccion,mensaje}=req.body
-    esquema
-    .updateOne({_id:id},{$set:{descripcion,mision,vision,valores,politicas,terminos,privacidad,correo,telefono,direccion,mensaje}})
-    .then((data)=>res.json(data))
-    .catch((error)=>res.json({message:error}))
-})
+// Eliminar una pregunta frecuente de una empresa por su ID y el ID de la pregunta frecuente
+routerem.delete('/empresas/:empresaId/preguntas-frecuentes/:preguntaId', (req, res) => {
+    const { empresaId, preguntaId } = req.params;
+    empresaModel.findByIdAndUpdate(
+        empresaId,
+        { $pull: { preguntasFrecuentes: { _id: preguntaId } } },
+        { new: true }
+    )
+        .then(data => res.json(data))
+        .catch(error => res.json({ message: error }));
+});
 
-//eliminar producto
-routerem.delete('/empresas/:id',(req,res)=>{
-    const{id}=req.params;
-    esquema.deleteOne({_id:id})
-    .then(data=>res.json(data))
-    .catch(error=>res.json({message:error}))
-})
-
-module.exports=routerem
+module.exports = routerem;
