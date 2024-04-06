@@ -1,8 +1,6 @@
-const mongoose=require('mongoose')
-const { Schema } = mongoose; // Asegúrate de tener esta línea
+const mongoose = require('mongoose');
 
-const usuarioSchema=mongoose.Schema(
-    {
+const usuarioSchema = mongoose.Schema({
     nombre: { type: String, require: true },
     apellido: { type: String, require: true },
     correo: { type: String, require: true, unique: true },
@@ -11,7 +9,8 @@ const usuarioSchema=mongoose.Schema(
     tipo: { type: String, require: true },
     preguntaRecuperacion: { type: String, require: true },
     respuestaPregunta: { type: String, require: true },
-    codigoRecuperacion: { type: String }
+    codigoRecuperacion: { type: String },
+    dispositivos: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Dispositivo' }], // Referencia a dispositivos
 });
 
 module.exports = mongoose.model('usuario', usuarioSchema);
