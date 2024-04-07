@@ -74,24 +74,46 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 
 
+
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     try {
         const { id } = req.params; // ID del dispositivo
         const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
         
-        // Verificar que el ID del dispositivo sea el esperado
-        const dispositivoIdValido = "6610cfa2e02e153998505e65";
-        if (id !== dispositivoIdValido) {
-            return res.status(400).json({ message: "ID de dispositivo inválido." });
-        }
-
         // Obtener la fecha y hora actual en la zona horaria de México
         const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
         
         // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
         const fechaHoraMexico = new Date(fechaHora);
+        
+        const dispositivoIdValido = "6610cfa2e02e153998505e65";
 
-        // Publicar el comando al topic MQTT
+        // Verificar que el ID del dispositivo es el esperado
+        if (id !== dispositivoIdValido) {
+            // Si el ID no coincide, enviar una respuesta de error
+            return res.status(400).json({ message: "ID de dispositivo inválido." });
+        }
+
+        // Encuentra el dispositivo correspondiente en la base de datos
+        const dispositivo = await esquema.findById(id);
+
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
+        }
+
+        // Actualiza la base de datos con el momento de mover huevos
+        dispositivo.fechaMovimientoHuevos = fechaHoraMexico;
+        await dispositivo.save();
+
+        // Almacena el movimiento de huevos en la tabla movimientohuevos
+        const movimientoHuevos = new MovimientoHuevos({
+            dispositivoId: id, // Asigna el ID del dispositivo
+            fechaMovimiento: fechaHoraMexico // Asigna la fecha y hora del movimiento de huevos
+            // Puedes agregar otros campos si es necesario
+        });
+        await movimientoHuevos.save();
+
+        // Publica el comando al topic MQTT
         client.publish('Entrada/01', comando, (error) => {
             if (error) {
                 console.error("Error al publicar mensaje MQTT", error);
