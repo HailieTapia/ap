@@ -78,7 +78,8 @@ router.put('/dispositivo/:id', (req, res) => {
     const { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } = req.body;
 
     // Actualizar el dispositivo en la base de datos
-    esquema.updateOne({ _id: id }, { $set: { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } })
+    esquema
+    .updateOne({ _id: id }, { $set: { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } })
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }));
 });
