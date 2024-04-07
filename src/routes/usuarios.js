@@ -349,7 +349,7 @@ router.post('/usuarios/restablecer-contrasena', async (req, res) => {
 });
 
 
-// Endpoint para obtener la pregunta de seguridad
+// Endpoint para obtener la pregunta de 
 router.get('/usuarios/obtener-pregunta-seguridad/:email', async (req, res) => {
     try {
         const usuario = await esquema.findOne({ correo: req.params.email });
