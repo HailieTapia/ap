@@ -55,11 +55,20 @@ routerd.post('/dispositivo',(req,res)=>{
 })
 
 //leer dispositivo
-routerd.get('/dispositivo',(req,res)=>{
-    esquema.find()
-    .then(data=>res.json(data))
-    .catch(error=>res.json({message:error}))
-})
+// Modifica el endpoint /dispositivo para filtrar por el usuario
+routerd.get('/dispositivo', async (req, res) => {
+    const userId = req.query.userId; // Obtiene el ID de usuario de la consulta
+
+    try {
+        // Busca los dispositivos asociados al usuario especificado
+        const dispositivos = await esquema.find({ usuario: userId });
+        res.json(dispositivos);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al obtener los dispositivos.' });
+    }
+});
+
 
 //buscar dispositivo
 routerd.get('/dispositivo/:id',(req,res)=>{
