@@ -24,7 +24,7 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const usuario = await Usuario.findById(userId).populate('dispositivos');
+        const usuario = await esquema.findById(userId).populate('dispositivos');
         if (!usuario) {
             return res.status(404).json({ error: "Usuario no encontrado." });
         }
@@ -44,22 +44,26 @@ router.put('/usuarios/asignar-dispositivo/:userId', async (req, res) => {
     const { codigoDevice } = req.body;
 
     try {
+        // Encuentra el usuario
         const usuario = await Usuario.findById(userId);
         if (!usuario) {
             return res.status(404).json({ error: "Usuario no encontrado." });
         }
 
+        // Encuentra el dispositivo por su código único
         const dispositivo = await Dispositivo.findOne({ claveUnica: codigoDevice });
         if (!dispositivo) {
             return res.status(404).json({ error: "Dispositivo no encontrado." });
         }
 
+        // Verifica si el dispositivo ya está asignado a algún usuario
         if (dispositivo.asignacion) {
             return res.status(400).json({ error: "El dispositivo ya está asignado a otro usuario." });
         }
 
+        // Asigna el dispositivo al usuario
         usuario.dispositivos.push(dispositivo._id);
-        dispositivo.asignacion = true;
+        dispositivo.asignacion = true; // Marca el dispositivo como asignado
         await usuario.save();
         await dispositivo.save();
 
@@ -88,8 +92,6 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
     }
 });
 
-
-/////////////////////////////////////////////////////
 // Endpoint de inicio de sesión
 router.get('/usuarios/perfil', async (req, res) => {
     try {
@@ -148,7 +150,6 @@ router.post('/usuarios/login', async (req, res) => {
 });
 
 
-
 router.get('/usuarios/x', (req, res) => {
     res.json({ "response": "Prueba Users" })
 })
@@ -201,14 +202,13 @@ router.delete('/usuarios/:id', (req, res) => {
         .then(data => res.json(data))
         .catch(error => res.json({ message: error }))
 })
-
 //Valido para recuperar contraseña, de aqui para arriba no modificar nada, ya todo funciona
 // Configuración del transportador de nodemailer
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-        user: "p36076220@gmail.com",
-        pass: "g j q a o h y x e x s z o f j p",
+        user: "proyeqtocuatri@gmail.com",
+        pass: "yijo yopr ejbk jguj",
     },
 });
 // Endpoint para solicitar recuperación de contraseña
@@ -241,13 +241,13 @@ router.post('/usuarios/solicitar-recuperacion', async (req, res) => {
         const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-                user: "p36076220@gmail.com",
-                pass: "g j q a o h y x e x s z o f j p",
+                user: "proyeqtocuatri@gmail.com",
+                pass: "yijo yopr ejbk jguj",
             },
         });
 
         const mailOptions = {
-            from: 'p36076220@gmail.com',
+            from: 'proyeqtocuatri@gmail.com',
             to: correo,
             subject: 'Recuperación de Contraseña',
             html: `<p>Hola ${usuario.nombre},</p>
@@ -387,3 +387,8 @@ router.post('/usuarios/verificar-respuesta-seguridad', async (req, res) => {
 });
 
 module.exports = router;
+
+module.exports = router
+
+// process.env.JWT_SECRET_RECUPERACION
+// process.env.EMAIL_USERNAME
