@@ -24,7 +24,7 @@ router.get('/usuarios/:userId/dispositivos', async (req, res) => {
     const { userId } = req.params;
 
     try {
-        const usuario = await esquema.findById(userId).populate('dispositivos');
+        const usuario = await Usuario.findById(userId).populate('dispositivos');
         if (!usuario) {
             return res.status(404).json({ error: "Usuario no encontrado." });
         }
@@ -44,26 +44,22 @@ router.put('/usuarios/asignar-dispositivo/:userId', async (req, res) => {
     const { codigoDevice } = req.body;
 
     try {
-        // Encuentra el usuario
         const usuario = await Usuario.findById(userId);
         if (!usuario) {
             return res.status(404).json({ error: "Usuario no encontrado." });
         }
 
-        // Encuentra el dispositivo por su código único
         const dispositivo = await Dispositivo.findOne({ claveUnica: codigoDevice });
         if (!dispositivo) {
             return res.status(404).json({ error: "Dispositivo no encontrado." });
         }
 
-        // Verifica si el dispositivo ya está asignado a algún usuario
         if (dispositivo.asignacion) {
             return res.status(400).json({ error: "El dispositivo ya está asignado a otro usuario." });
         }
 
-        // Asigna el dispositivo al usuario
         usuario.dispositivos.push(dispositivo._id);
-        dispositivo.asignacion = true; // Marca el dispositivo como asignado
+        dispositivo.asignacion = true;
         await usuario.save();
         await dispositivo.save();
 
