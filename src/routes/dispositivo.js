@@ -84,26 +84,25 @@ routerd.put('/dispositivo/:id', (req, res) => {
 })
 
 
-
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
+    const { id } = req.params; // ID del dispositivo
+    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+    
+    // Obtener la fecha y hora actual en la zona horaria de México
+    const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
+    
+    // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
+    const fechaHoraMexico = new Date(fechaHora);
+    
+    const dispositivoIdValido = "6610cfa2e02e153998505e65";
+
+    // Verificar que el ID del dispositivo es el esperado
+    if (id !== dispositivoIdValido) {
+        // Si el ID no coincide, enviar una respuesta de error
+        return res.status(400).json({ message: "ID de dispositivo inválido." });
+    }
+
     try {
-        const { id } = req.params; // ID del dispositivo
-        const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
-        
-        // Obtener la fecha y hora actual en la zona horaria de México
-        const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
-        
-        // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
-        const fechaHoraMexico = new Date(fechaHora);
-        
-        const dispositivoIdValido = "6610cfa2e02e153998505e65";
-
-        // Verificar que el ID del dispositivo es el esperado
-        if (id !== dispositivoIdValido) {
-            // Si el ID no coincide, enviar una respuesta de error
-            return res.status(400).json({ message: "ID de dispositivo inválido." });
-        }
-
         // Encuentra el dispositivo correspondiente en la base de datos
         const dispositivo = await esquema.findById(id);
 
@@ -136,6 +135,7 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         return res.status(500).json({ error: 'Error interno del servidor' });
     }
 });
+
 
 
 
