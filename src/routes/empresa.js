@@ -66,7 +66,7 @@ routerem.delete('/empresas/:empresaId/preguntas-frecuentes/:preguntaId', (req, r
         .catch(error => res.json({ message: error }));
 });
 // Actualizar una pregunta frecuente de una empresa por su ID y el ID de la pregunta frecuente
-router.put('/empresas/:empresaId/preguntas-frecuentes/:preguntaId', (req, res) => {
+routerem.put('/empresas/:empresaId/preguntas-frecuentes/:preguntaId', (req, res) => {
     const { empresaId, preguntaId } = req.params;
     const { pregunta, respuesta } = req.body; // Obtener la pregunta y respuesta actualizadas desde el cuerpo de la solicitud
 
