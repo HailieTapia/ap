@@ -72,6 +72,18 @@ routerd.get('/dispositivo/:id',(req,res)=>{
     .catch(error=>res.json({message:error}))
 }) 
 
+//actualizar dispositivo
+router.put('/dispositivo/:id', (req, res) => {
+    const { id } = req.params;
+    const { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } = req.body;
+
+    // Actualizar el dispositivo en la base de datos
+    Dispositivo.updateOne({ _id: id }, { $set: { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } })
+        .then((data) => res.json(data))
+        .catch((error) => res.json({ message: error }));
+});
+
+
 
 
 
