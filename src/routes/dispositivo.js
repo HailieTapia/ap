@@ -41,7 +41,17 @@ client.on('message', (topic, message) => {
     }
 });
 
+router.get('/api/estado-dispositivos', async (req, res) => {
+    try {
+        // Consulta la base de datos para obtener el estado de los dispositivos
+        const estadoDispositivos = await Dispositivo.find({}, { _id: 0, __v: 0 }); // Excluye el campo _id y __v
 
+        res.json(estadoDispositivos); // Devuelve el estado de los dispositivos como respuesta JSON
+    } catch (error) {
+        console.error("Error al obtener el estado de los dispositivos:", error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 routerd.get('/dispositivo/prueba',(req,res)=>{
     res.json({"response":"Prueba Disp"})
@@ -84,7 +94,7 @@ routerd.put('/dispositivo/:id', (req, res) => {
 })
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     const { id } = req.params; // ID del dispositivo
-    const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
+    const { comando } = req.body; // Comando enviado en el ud
     
     // Obtener la fecha y hora actual en la zona horaria de México
     const fechaHora = new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" });
