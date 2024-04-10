@@ -82,8 +82,6 @@ routerd.put('/dispositivo/:id', (req, res) => {
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }))
 })
-
-
 routerd.post('/dispositivo/comando/:id', async (req, res) => {
     const { id } = req.params; // ID del dispositivo
     const { comando } = req.body; // Comando enviado en el cuerpo de la solicitud
@@ -93,14 +91,6 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
     
     // Crear un nuevo objeto Date a partir de la fecha y hora en la zona horaria de México
     const fechaHoraMexico = new Date(fechaHora);
-    
-    const dispositivoIdValido = "6610cfa2e02e153998505e65";
-
-    // Verificar que el ID del dispositivo es el esperado
-    if (id !== dispositivoIdValido) {
-        // Si el ID no coincide, enviar una respuesta de error
-        return res.status(400).json({ message: "ID de dispositivo inválido." });
-    }
 
     try {
         // Encuentra el dispositivo correspondiente en la base de datos
@@ -123,7 +113,8 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
         await movimientoHuevos.save();
 
         // Publica el comando al topic MQTT
-        client.publish('Entrada/01', comando, (error) => {
+        const topic = `Entrada/${dispositivo.claveUnica}`; // Corrección de comillas y concatenación
+        client.publish(topic, comando, (error) => {
             if (error) {
                 console.error("Error al publicar mensaje MQTT", error);
                 return res.status(500).json({ message: "Error al enviar comando MQTT." });
@@ -131,8 +122,8 @@ routerd.post('/dispositivo/comando/:id', async (req, res) => {
             res.json({ message: "Comando enviado con éxito." });
         });
     } catch (error) {
-        console.error('Error al enviar comando al dispositivo:', error);
-        return res.status(500).json({ error: 'Error interno del servidor' });
+        console.error("Error al enviar comando: ", error);
+        res.status(500).json({ error: "Error al enviar comando." });
     }
 });
 
