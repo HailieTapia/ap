@@ -66,7 +66,7 @@ routerd.get('/dispositivo', (req, res) => {
 router.get('/api/estado-dispositivos', async (req, res) => {
     try {
         // Consulta la base de datos para obtener el estado de los dispositivos
-        const estadoDispositivos = await Dispositivo.find({}, { _id: 0, __v: 0 }); // Excluye el campo _id y __v
+        const estadoDispositivos = await Dispositivo.find(); // Sin especificar campos a excluir
 
         res.json(estadoDispositivos); // Devuelve el estado de los dispositivos como respuesta JSON
     } catch (error) {
