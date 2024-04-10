@@ -20,7 +20,7 @@ client.on('connect', () => {
         }
     });
 });
-
+//
 client.on('message', (topic, message) => {
     // Suponiendo que el topic es "dispensador/estado"
     if (topic === "Entrada/01/estado") {
@@ -63,6 +63,17 @@ routerd.get('/dispositivo', (req, res) => {
         .catch(error => res.json({ message: error }))
 })
 
+router.get('/api/estado-dispositivos', async (req, res) => {
+    try {
+        // Consulta la base de datos para obtener el estado de los dispositivos
+        const estadoDispositivos = await Dispositivo.find({}, { _id: 0, __v: 0 }); // Excluye el campo _id y __v
+
+        res.json(estadoDispositivos); // Devuelve el estado de los dispositivos como respuesta JSON
+    } catch (error) {
+        console.error("Error al obtener el estado de los dispositivos:", error);
+        res.status(500).json({ error: 'Error interno del servidor' });
+    }
+});
 
 //buscar dispositivo
 routerd.get('/dispositivo/:id',(req,res)=>{
