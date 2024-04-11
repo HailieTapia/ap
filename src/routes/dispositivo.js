@@ -72,6 +72,36 @@ routerd.get('/dispositivo/:id',(req,res)=>{
     .catch(error=>res.json({message:error}))
 }) 
 
+
+//monse}
+routerd.put('/dispositivo/:id/estado', async (req, res) => {
+    const { id } = req.params;
+    const { estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2 } = req.body;
+
+    try {
+        const dispositivo = await esquema.findById(id);
+
+        if (!dispositivo) {
+            return res.status(404).json({ error: 'Dispositivo no encontrado' });
+        }
+
+        // Actualizar solo los campos de estado del dispositivo
+        dispositivo.estadoFoco = estadoFoco;
+        dispositivo.estadoCerradura = estadoCerradura;
+        dispositivo.estadoVentilador = estadoVentilador;
+        dispositivo.estadoVentilador2 = estadoVentilador2;
+
+        await dispositivo.save();
+
+        res.json({ message: 'Estado del dispositivo actualizado exitosamente' });
+    } catch (error) {
+        console.error("Error al actualizar el estado del dispositivo: ", error);
+        res.status(500).json({ error: "Error al actualizar el estado del dispositivo" });
+    }
+});
+
+
+
 //actualizar dispositivo
 
 routerd.put('/dispositivo/:id', (req, res) => {
