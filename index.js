@@ -12,12 +12,21 @@ const typeUser = require('./src/routes/tipoUsuario');
 const user = require('./src/routes/usuarios');
 const emp = require('./src/routes/empresa');
 
-// Configuración de CORS
+const ACCEPTEP_ORIGINS = [
+    'http://localhost:3000',
+]
+
 const corsOptions = {
-    origin: '*',
-    methods: ['GET', 'POST', 'PUT', 'DELETE']
+    origin: function (origin, callback) {
+        if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
+            callback(null, true); // Permite la solicitud
+        } else {
+            callback(new Error('Not allowed by CORS')); // Rechaza la solicitud
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
 };
-app.use(cors(corsOptions));
+
 
 // Middleware para el manejo de datos JSON
 app.use(express.json());

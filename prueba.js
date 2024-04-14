@@ -18,22 +18,7 @@ const emp=require('./src/routes/empresa')
 const ACCEPTEP_ORIGINS = [
     'http://localhost:3000',
 ]
-// const corsOptions = {
-//     origin: function (origin, callback) {
-//         if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
-//             callback(null, true);
-//         } else {
-//             callback(new Error('Not allowed by CORS'));
-//         }
-//     },
-// };
 
-// app.use(cors({
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-// }));
-
-//este es el apartado que modificique de los cors
-//comienza aqui
 const corsOptions = {
     origin: function (origin, callback) {
         if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
