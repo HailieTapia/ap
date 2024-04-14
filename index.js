@@ -12,8 +12,12 @@ const typeUser = require('./src/routes/tipoUsuario');
 const user = require('./src/routes/usuarios');
 const emp = require('./src/routes/empresa');
 
-// Habilitar CORS para todas las solicitudes desde cualquier origen
-app.use(cors());
+// Configuración de CORS
+const corsOptions = {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+};
+app.use(cors(corsOptions));
 
 // Middleware para el manejo de datos JSON
 app.use(express.json());
@@ -29,12 +33,6 @@ app.use('/api/', product);
 app.use('/api/', typeUser);
 app.use('/api/', user);
 app.use('/api/', emp);
-
-// Configuración de los métodos HTTP permitidos
-app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    next();
-});
 
 // Conección con la base de datos
 mongoose.connect(process.env.mongouri)
