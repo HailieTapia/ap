@@ -1,42 +1,26 @@
-const express = require('express')
-const mongoose = require('mongoose')
+const express = require('express');
+const mongoose = require('mongoose');
 const cors = require('cors');
+require('dotenv').config();
 
-require('dotenv').config()
+const app = express();
+const port = process.env.PORT || 3000; // Usar el puerto definido en la variable de entorno PORT o el puerto 3000 por defecto
 
-const app = express()
-const port = process.env.PORT || 3000
+const device = require('./src/routes/dispositivo');
+const product = require('./src/routes/productos');
+const typeUser = require('./src/routes/tipoUsuario');
+const user = require('./src/routes/usuarios');
+const emp = require('./src/routes/empresa');
 
-const device = require('./src/routes/dispositivo')
-const product = require('./src/routes/productos')
-const typeUser = require('./src/routes/tipoUsuario')
-const user = require('./src/routes/usuarios')
-const emp=require('./src/routes/empresa')
-
-
-//CORES
-const ACCEPTEP_ORIGINS = [
+// CORS
+const ACCEPTED_ORIGINS = [
     'http://localhost:3000',
-]
-// const corsOptions = {
-//     origin: function (origin, callback) {
-//         if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
-//             callback(null, true);
-//         } else {
-//             callback(new Error('Not allowed by CORS'));
-//         }
-//     },
-// };
+    // Agrega aquí otros orígenes permitidos si es necesario
+];
 
-// app.use(cors({
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-// }));
-
-//este es el apartado que modificique de los cors
-//comienza aqui
 const corsOptions = {
     origin: function (origin, callback) {
-        if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
+        if (!origin || ACCEPTED_ORIGINS.includes(origin)) {
             callback(null, true); // Permite la solicitud
         } else {
             callback(new Error('Not allowed by CORS')); // Rechaza la solicitud
@@ -46,26 +30,27 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-//aqui termina 
 
-//midlewares
-app.use(express.json())
+// Middleware para el análisis de cuerpos JSON
+app.use(express.json());
 
+// Rutas de la aplicación
 app.get('/', (req, res) => {
-    res.json({ "response": "Prueba de Device" })
-})
+    res.json({ "response": "Prueba de Device" });
+});
 
-app.use('/api/', device)
-app.use('/api/', product)
-app.use('/api/', typeUser)
-app.use('/api/', user)
-app.use('/api/', emp)
+app.use('/api/', device);
+app.use('/api/', product);
+app.use('/api/', typeUser);
+app.use('/api/', user);
+app.use('/api/', emp);
 
+// Conexión a la base de datos
+mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => console.log('Conectado a la base de datos'))
+    .catch(error => console.error('Error de conexión a la base de datos:', error));
 
-//coneccion con la base de dato
-mongoose.connect(process.env.mongouri)
-    .then(() => console.log('conectado a la base'))
-    .catch(error => console.log(error))
+// Iniciar el servidor
 app.listen(port, () => {
-    console.log('corriendo en el puerto ' + port)
-})
+    console.log('Servidor escuchando en el puerto ' + port);
+});
