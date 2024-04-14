@@ -35,7 +35,7 @@ client.on('message', (topic, message) => {
             estadoCerradura: estado.cerradura,
             estadoVentilador: estado.ventilador1,
             estadoVentilador2: estado.ventilador2,
-            
+            controlAutomatico: estado.controlAutomatico
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
@@ -77,9 +77,9 @@ routerd.get('/dispositivo/:id',(req,res)=>{
 
 routerd.put('/dispositivo/:id', (req, res) => {
     const { id } = req.params;
-    const { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } = req.body
+    const { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion,controlAutomatico } = req.body
     esquema
-        .updateOne({ _id: id }, { $set: { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion } })
+        .updateOne({ _id: id }, { $set: { temperatura, humedad, estadoFoco, estadoCerradura, estadoVentilador, estadoVentilador2, fechaMovimientoHuevos, claveUnica, asignacion, controlAutomatico} })
         .then((data) => res.json(data))
         .catch((error) => res.json({ message: error }))
 })
