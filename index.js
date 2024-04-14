@@ -17,6 +17,7 @@ const emp=require('./src/routes/empresa')
 //CORES
 const ACCEPTEP_ORIGINS = [
     'http://localhost:3000',
+    'polloinnova.losdela/catalogo'
 ]
 // const corsOptions = {
 //     origin: function (origin, callback) {
