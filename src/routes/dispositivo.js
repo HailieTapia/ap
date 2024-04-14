@@ -34,7 +34,7 @@ client.on('message', (topic, message) => {
             estadoFoco: estado.foco,
             estadoCerradura: estado.cerradura,
             estadoVentilador: estado.ventilador1,
-            estadoVentilador2: estado.ventilador2z
+            estadoVentilador2: estado.ventilador2
         }})
         .then(result => console.log("Actualización exitosa", result))
         .catch(error => console.error("Error al actualizar el dispositivo", error));
