@@ -10,7 +10,7 @@ const dispositivoSchema = mongoose.Schema({
     fechaMovimientoHuevos: { type: Date, required: false }, // Cenar la fecha y hora del último movimiento de huevos
     claveUnica:{type:String}, ///
     asignacion:{type:Boolean},  ///z
-    controlAutomatico: { type: Boolean, default: false } // Agregamos esta línea
+    controlAutomatico: { type: Boolean, required: false } // Agregamos esta línea
 });
 
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
