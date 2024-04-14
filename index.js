@@ -1,41 +1,71 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const express = require('express')
+const mongoose = require('mongoose')
 const cors = require('cors');
-require('dotenv').config();
 
-const app = express();
-const port = process.env.PORT || 3000;
+require('dotenv').config()
 
-const device = require('./src/routes/dispositivo');
-const product = require('./src/routes/productos');
-const typeUser = require('./src/routes/tipoUsuario');
-const user = require('./src/routes/usuarios');
-const emp = require('./src/routes/empresa');
+const app = express()
+const port = process.env.PORT || 3000
 
-// Permitir todas las solicitudes CORS desde cualquier origen
-app.use(cors());
+const device = require('./src/routes/dispositivo')
+const product = require('./src/routes/productos')
+const typeUser = require('./src/routes/tipoUsuario')
+const user = require('./src/routes/usuarios')
+const emp=require('./src/routes/empresa')
 
-// Middleware para el manejo de datos JSON
-app.use(express.json());
 
-// Ruta de inicio
+//CORES
+const ACCEPTEP_ORIGINS = [
+    'http://localhost:3000',
+]
+// const corsOptions = {
+//     origin: function (origin, callback) {
+//         if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
+//             callback(null, true);
+//         } else {
+//             callback(new Error('Not allowed by CORS'));
+//         }
+//     },
+// };
+
+// app.use(cors({
+//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+// }));
+
+//este es el apartado que modificique de los cors
+//comienza aqui
+const corsOptions = {
+    origin: function (origin, callback) {
+        if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
+            callback(null, true); // Permite la solicitud
+        } else {
+            callback(new Error('Not allowed by CORS')); // Rechaza la solicitud
+        }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE'], // Métodos HTTP permitidos
+};
+
+app.use(cors(corsOptions));
+//aqui termina 
+
+//midlewares
+app.use(express.json())
+
 app.get('/', (req, res) => {
-    res.json({ "response": "Prueba de Device" });
-});
+    res.json({ "response": "Prueba de Device" })
+})
 
-// Rutas de la API
-app.use('/api/', device);
-app.use('/api/', product);
-app.use('/api/', typeUser);
-app.use('/api/', user);
-app.use('/api/', emp);
+app.use('/api/', device)
+app.use('/api/', product)
+app.use('/api/', typeUser)
+app.use('/api/', user)
+app.use('/api/', emp)
 
-// Conección a la base de datos
+
+//coneccion con la base de dato
 mongoose.connect(process.env.mongouri)
-    .then(() => console.log('Conectado a la base de datos'))
-    .catch(error => console.log(error));
-
-// Iniciar el servidor
+    .then(() => console.log('conectado a la base'))
+    .catch(error => console.log(error))
 app.listen(port, () => {
-    console.log('Corriendo en el puerto ' + port);
-});
+    console.log('corriendo en el puerto ' + port)
+})
