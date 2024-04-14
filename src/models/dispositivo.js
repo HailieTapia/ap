@@ -9,8 +9,7 @@ const dispositivoSchema = mongoose.Schema({
     estadoVentilador2: { type: String, required: false }, // Campo estadoVentilador2
     fechaMovimientoHuevos: { type: Date, required: false }, // Cenar la fecha y hora del último movimiento de huevos
     claveUnica:{type:String}, ///
-    asignacion:{type:Boolean},  ///z
-    controlAutomatico: { type: Boolean, required: false } // Agregamos esta línea
+    asignacion:{type:Boolean},  ///
 });
 
 const Dispositivo = mongoose.model('Dispositivo', dispositivoSchema);
