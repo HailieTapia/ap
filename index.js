@@ -15,10 +15,10 @@ const emp=require('./src/routes/empresa')
 
 
 //CORES
-const ACCEPTEP_ORIGINS = [
-    'http://localhost:3000',
-    'polloinnova.losdela/catalogo'
-]
+const allowedOrigins = [
+    'http://localhost:3000',               // Ejemplo de localhost
+    'http://polloinnova.losdela.com'       // URL de tu dominio
+];
 // const corsOptions = {
 //     origin: function (origin, callback) {
 //         if (!origin || ACCEPTEP_ORIGINS.includes(origin)) {
