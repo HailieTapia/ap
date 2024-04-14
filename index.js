@@ -30,6 +30,12 @@ app.use('/api/', typeUser);
 app.use('/api/', user);
 app.use('/api/', emp);
 
+// Configuración de los métodos HTTP permitidos
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    next();
+});
+
 // Conección con la base de datos
 mongoose.connect(process.env.mongouri)
     .then(() => console.log('Conectado a la base de datos'))
