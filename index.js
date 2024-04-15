@@ -24,8 +24,7 @@ app.use(express.json());
 
 // Middleware de autenticación de usuario
 app.use((req, res, next) => {
-    // Aquí puedes agregar la lógica de autenticación de usuario
-    // Por ejemplo, verificar si el usuario está autenticado
+   
     // Si el usuario no está autenticado, puedes responder con un error 401 (No autorizado)
     next();
 });
